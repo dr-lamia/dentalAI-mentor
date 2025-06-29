@@ -1,6 +1,6 @@
 // AI Integration Service - Connects UI to FastAPI endpoints
 class AIIntegrationService {
-  private baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  private baseUrl = import.meta.env.VITE_API_URL || '/api';
   private geminiApiKey = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s';
 
   // Chat & Q&A - Hook "Ask Tutor" buttons to POST /ask
