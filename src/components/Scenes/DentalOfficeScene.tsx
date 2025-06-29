@@ -47,6 +47,203 @@ const RealisticToothModel = ({
     }
   };
 
+  // Create different tooth shapes based on type
+  const renderToothGeometry = () => {
+    switch(toothType) {
+      case 'incisor':
+        return (
+          <>
+            {/* Incisor crown - more flat and blade-like */}
+            <mesh position={[0, 0.9, 0]}>
+              <boxGeometry args={[1.4, 1.8, 0.8]} />
+              <meshStandardMaterial 
+                color={getToothColor()} 
+                roughness={0.2}
+                metalness={0.05}
+              />
+            </mesh>
+            
+            {/* Incisal edge */}
+            <mesh position={[0, 1.8, 0]}>
+              <boxGeometry args={[1.4, 0.2, 0.8]} />
+              <meshStandardMaterial 
+                color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#f5f5f5'}
+                roughness={0.3}
+              />
+            </mesh>
+            
+            {/* Single root */}
+            <mesh position={[0, -0.5, 0]}>
+              <cylinderGeometry args={[0.4, 0.2, 2, 12]} />
+              <meshStandardMaterial 
+                color="#f0e68c" 
+                roughness={0.4}
+                metalness={0.02}
+              />
+            </mesh>
+          </>
+        );
+        
+      case 'premolar':
+        return (
+          <>
+            {/* Premolar crown - smaller than molar with two cusps */}
+            <mesh position={[0, 0.9, 0]}>
+              <cylinderGeometry args={[0.8, 0.9, 1.6, 12]} />
+              <meshStandardMaterial 
+                color={getToothColor()} 
+                roughness={0.2}
+                metalness={0.05}
+              />
+            </mesh>
+            
+            {/* Occlusal surface with two cusps */}
+            <group position={[0, 1.7, 0]}>
+              <mesh position={[0, 0, 0]}>
+                <cylinderGeometry args={[0.7, 0.7, 0.15, 12]} />
+                <meshStandardMaterial 
+                  color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#faf8f5'}
+                  roughness={0.3}
+                />
+              </mesh>
+              
+              {/* Buccal cusp */}
+              <mesh position={[0, 0.1, 0.3]}>
+                <sphereGeometry args={[0.25, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+              
+              {/* Lingual cusp */}
+              <mesh position={[0, 0.1, -0.3]}>
+                <sphereGeometry args={[0.25, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+            </group>
+            
+            {/* Two roots */}
+            <group position={[0, -0.5, 0]}>
+              <mesh position={[0, 0, 0.2]}>
+                <cylinderGeometry args={[0.3, 0.15, 1.8, 12]} />
+                <meshStandardMaterial 
+                  color="#f0e68c" 
+                  roughness={0.4}
+                  metalness={0.02}
+                />
+              </mesh>
+              
+              <mesh position={[0, 0, -0.2]}>
+                <cylinderGeometry args={[0.3, 0.15, 1.8, 12]} />
+                <meshStandardMaterial 
+                  color="#f0e68c" 
+                  roughness={0.4}
+                  metalness={0.02}
+                />
+              </mesh>
+            </group>
+          </>
+        );
+        
+      case 'molar':
+      default:
+        return (
+          <>
+            {/* Molar crown - larger with multiple cusps */}
+            <mesh position={[0, 0.9, 0]}>
+              <cylinderGeometry args={[0.9, 1.1, 1.8, 12]} />
+              <meshStandardMaterial 
+                color={getToothColor()} 
+                roughness={0.2}
+                metalness={0.05}
+              />
+            </mesh>
+            
+            {/* Occlusal surface with cusps */}
+            <group position={[0, 1.8, 0]}>
+              <mesh position={[0, 0, 0]}>
+                <cylinderGeometry args={[0.8, 0.8, 0.15, 12]} />
+                <meshStandardMaterial 
+                  color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#faf8f5'}
+                  roughness={0.3}
+                />
+              </mesh>
+              
+              {/* Mesial cusp */}
+              <mesh position={[0.3, 0.1, 0.2]}>
+                <sphereGeometry args={[0.25, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+              
+              {/* Distal cusp */}
+              <mesh position={[-0.3, 0.08, 0.15]}>
+                <sphereGeometry args={[0.22, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+              
+              {/* Buccal cusp */}
+              <mesh position={[0.1, 0.05, 0.4]}>
+                <sphereGeometry args={[0.2, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+              
+              {/* Lingual cusp */}
+              <mesh position={[-0.1, 0.03, -0.35]}>
+                <sphereGeometry args={[0.18, 8, 6]} />
+                <meshStandardMaterial 
+                  color={getToothColor()}
+                  roughness={0.25}
+                />
+              </mesh>
+            </group>
+            
+            {/* Multiple roots */}
+            <group position={[0, -0.5, 0]}>
+              <mesh position={[0.3, 0, 0.3]}>
+                <cylinderGeometry args={[0.3, 0.15, 1.8, 12]} />
+                <meshStandardMaterial 
+                  color="#f0e68c" 
+                  roughness={0.4}
+                  metalness={0.02}
+                />
+              </mesh>
+              
+              <mesh position={[-0.3, 0, 0.3]}>
+                <cylinderGeometry args={[0.3, 0.15, 1.8, 12]} />
+                <meshStandardMaterial 
+                  color="#f0e68c" 
+                  roughness={0.4}
+                  metalness={0.02}
+                />
+              </mesh>
+              
+              <mesh position={[0, 0, -0.3]}>
+                <cylinderGeometry args={[0.3, 0.15, 1.8, 12]} />
+                <meshStandardMaterial 
+                  color="#f0e68c" 
+                  roughness={0.4}
+                  metalness={0.02}
+                />
+              </mesh>
+            </group>
+          </>
+        );
+    }
+  };
+
   return (
     <group 
       position={position} 
@@ -55,65 +252,9 @@ const RealisticToothModel = ({
       onPointerOut={() => setHovered(false)}
       scale={isSelected ? 1.2 : hovered ? 1.05 : 1}
     >
-      {/* Main Crown - More anatomical shape */}
+      {/* Main tooth structure */}
       <group ref={meshRef}>
-        {/* Central crown body with natural taper */}
-        <mesh>
-          <cylinderGeometry args={[0.9, 1.1, 1.8, 12]} />
-          <meshStandardMaterial 
-            color={getToothColor()} 
-            roughness={0.2}
-            metalness={0.05}
-          />
-        </mesh>
-        
-        {/* Occlusal surface with cusps */}
-        <group position={[0, 1.0, 0]}>
-          {/* Main occlusal surface */}
-          <mesh position={[0, 0, 0]}>
-            <cylinderGeometry args={[0.8, 0.8, 0.15, 12]} />
-            <meshStandardMaterial 
-              color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#faf8f5'}
-              roughness={0.3}
-            />
-          </mesh>
-          
-          {/* Mesial cusp */}
-          <mesh position={[0.3, 0.1, 0.2]}>
-            <sphereGeometry args={[0.25, 8, 6]} />
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </mesh>
-          
-          {/* Distal cusp */}
-          <mesh position={[-0.3, 0.08, 0.15]}>
-            <sphereGeometry args={[0.22, 8, 6]} />
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </mesh>
-          
-          {/* Buccal cusp */}
-          <mesh position={[0.1, 0.05, 0.4]}>
-            <sphereGeometry args={[0.2, 8, 6]} />
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </mesh>
-          
-          {/* Lingual cusp */}
-          <mesh position={[-0.1, 0.03, -0.35]}>
-            <sphereGeometry args={[0.18, 8, 6]} />
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </mesh>
-        </group>
+        {renderToothGeometry()}
 
         {/* Cervical line / CEJ */}
         <mesh position={[0, 0.1, 0]}>
@@ -126,28 +267,6 @@ const RealisticToothModel = ({
             opacity={0.6}
           />
         </mesh>
-
-        {/* Root structure - More anatomical */}
-        <group position={[0, -0.8, 0]}>
-          {/* Main root */}
-          <mesh position={[0, 0, 0]}>
-            <cylinderGeometry args={[0.7, 0.4, 1.6, 12]} />
-            <meshStandardMaterial 
-              color="#f0e68c" 
-              roughness={0.4}
-              metalness={0.02}
-            />
-          </mesh>
-          
-          {/* Root apex */}
-          <mesh position={[0, -0.8, 0]}>
-            <sphereGeometry args={[0.35, 8, 6]} />
-            <meshStandardMaterial 
-              color="#e6d875"
-              roughness={0.5}
-            />
-          </mesh>
-        </group>
 
         {/* Preparation margin line */}
         {preparationProgress.marginPreparation && (
@@ -162,25 +281,6 @@ const RealisticToothModel = ({
             />
           </mesh>
         )}
-
-        {/* Anatomical grooves */}
-        <mesh position={[0.4, 0.9, 0]} rotation={[0, 0, 0.2]}>
-          <boxGeometry args={[0.05, 1.5, 1.8]} />
-          <meshStandardMaterial 
-            color="#e8dcc0"
-            transparent
-            opacity={0.7}
-          />
-        </mesh>
-        
-        <mesh position={[-0.4, 0.9, 0]} rotation={[0, 0, -0.2]}>
-          <boxGeometry args={[0.05, 1.5, 1.8]} />
-          <meshStandardMaterial 
-            color="#e8dcc0"
-            transparent
-            opacity={0.7}
-          />
-        </mesh>
       </group>
 
       {/* Selection indicator */}
