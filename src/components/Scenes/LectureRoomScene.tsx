@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, MessageSquare, FileText, Search, Brain, Lightbulb, Users, Clock, Upload, X, CheckCircle } from 'lucide-react';
+import { BookOpen, MessageCircle, FileText, Search, Brain, Lightbulb, Users, Clock, Upload, X, CheckCircle } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { dentalMentorService } from '../../services/dentalMentorService';
 import { useDropzone } from 'react-dropzone';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface LectureNote {
   id: string;
@@ -54,6 +55,19 @@ const LectureRoomScene: React.FC = () => {
       type: 'txt'
     }
   ]);
+  const [geminiModel, setGeminiModel] = useState<any>(null);
+
+  useEffect(() => {
+    // Initialize Google Gemini AI
+    try {
+      const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s';
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      setGeminiModel(model);
+    } catch (error) {
+      console.error('Error initializing Gemini AI:', error);
+    }
+  }, []);
 
   // File upload functionality
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -83,7 +97,7 @@ const LectureRoomScene: React.FC = () => {
 
     for (const file of uploadedFiles) {
       try {
-        // Simulate file content extraction
+        // Extract content from file
         const content = await readFileContent(file);
         
         const newNote: LectureNote = {
@@ -99,6 +113,16 @@ const LectureRoomScene: React.FC = () => {
         
         setLectureNotes(prev => [...prev, newNote]);
         dentalMentorService.addDocumentContext(content);
+        
+        // Add to Gemini context if available
+        if (geminiModel) {
+          try {
+            // In a real implementation, you would add this to a vector database
+            console.log('Adding document to AI context:', newNote.title);
+          } catch (error) {
+            console.error('Error adding document to AI context:', error);
+          }
+        }
         
         // Award XP for uploading
         dispatch({ type: 'EARN_XP', payload: 10 });
@@ -188,8 +212,37 @@ const LectureRoomScene: React.FC = () => {
     };
 
     try {
-      // Use DentalMentor service for RAG-powered response
-      const answer = await dentalMentorService.answerStudentQuestion(currentQuestion);
+      let answer = '';
+      
+      // Try using Gemini directly if available
+      if (geminiModel) {
+        try {
+          // Create context from lecture notes
+          const context = lectureNotes.map(note => 
+            `Document: ${note.title}\nContent: ${note.content}`
+          ).join('\n\n');
+          
+          const prompt = `You are Dr. DentalMentor, an expert dental educator. 
+          Use the following lecture notes as context to answer the student's question:
+          
+          ${context}
+          
+          Student question: ${currentQuestion}
+          
+          Provide a clear, educational answer based on the lecture notes and your dental knowledge.`;
+          
+          const result = await geminiModel.generateContent(prompt);
+          const response = await result.response;
+          answer = response.text();
+        } catch (geminiError) {
+          console.error('Error using Gemini directly:', geminiError);
+          // Fall back to DentalMentor service
+          answer = await dentalMentorService.answerStudentQuestion(currentQuestion);
+        }
+      } else {
+        // Use DentalMentor service
+        answer = await dentalMentorService.answerStudentQuestion(currentQuestion);
+      }
       
       const completedQuestion = { ...newQuestion, answer };
       setChatHistory(prev => [...prev, completedQuestion]);
@@ -373,7 +426,7 @@ const LectureRoomScene: React.FC = () => {
                     { icon: Brain, title: "Ask about Procedures", desc: "Get step-by-step guidance", question: "Walk me through a root canal procedure" },
                     { icon: Lightbulb, title: "Clarify Concepts", desc: "Understand complex topics", question: "Explain the 2017 periodontal classification" },
                     { icon: BookOpen, title: "Review Notes", desc: "Quick reference and summaries", question: "Summarize crown preparation principles" },
-                    { icon: MessageSquare, title: "Case Discussion", desc: "Clinical scenario analysis", question: "Help me analyze a complex endodontic case" }
+                    { icon: MessageCircle, title: "Case Discussion", desc: "Clinical scenario analysis", question: "Help me analyze a complex endodontic case" }
                   ].map((feature, index) => {
                     const Icon = feature.icon;
                     return (

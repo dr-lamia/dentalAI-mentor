@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, SortAsc, Play } from 'lucide-react';
 import ModuleCard from './ModuleCard';
 import { Module, DentalSpecialty } from '../../types';
+import { aiIntegrationService } from '../../services/aiIntegrationService';
+import { useGame } from '../../contexts/GameContext';
 
 interface ModulesGridProps {
   onSceneSelect?: (scene: string) => void;
 }
 
 const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
+  const { state, dispatch } = useGame();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<DentalSpecialty | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
-
-  const modules: Module[] = [
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedTopic, setGeneratedTopic] = useState('');
+  const [modules, setModules] = useState<Module[]>([
     // Interactive Scene Modules
     {
       id: 'dental-office-sim',
@@ -171,12 +175,98 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
       completionRate: 0,
       moduleType: 'diagnosis-treatment'
     }
-  ];
+  ]);
 
   const specialties = [
     'endodontics', 'periodontics', 'prosthodontics', 'orthodontics',
     'pedodontics', 'oral-surgery', 'oral-medicine', 'radiology'
   ];
+
+  useEffect(() => {
+    // Check for any saved modules in localStorage
+    const savedModules = localStorage.getItem('dentalMentorModules');
+    if (savedModules) {
+      try {
+        const parsedModules = JSON.parse(savedModules);
+        setModules(prevModules => [...prevModules, ...parsedModules]);
+      } catch (error) {
+        console.error('Error parsing saved modules:', error);
+      }
+    }
+  }, []);
+
+  const generateAIModule = async () => {
+    setIsGenerating(true);
+    try {
+      // Generate a random topic if none is provided
+      const topics = [
+        'Dental Implant Placement', 
+        'Composite Restoration Techniques', 
+        'Dental Trauma Management',
+        'Dental Materials Science',
+        'Occlusion and TMJ Disorders'
+      ];
+      const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+      const topic = generatedTopic || randomTopic;
+      
+      // Use AI service to generate module content
+      const moduleData = await aiIntegrationService.generateModule(topic);
+      
+      // Create new module object
+      const newModule = {
+        id: `ai-generated-${Date.now()}`,
+        title: `AI-Generated: ${topic}`,
+        description: `AI-generated learning module about ${topic} with personalized content.`,
+        icon: '🤖',
+        specialty: (moduleData.specialty as DentalSpecialty) || 'prosthodontics',
+        difficulty: (moduleData.difficulty as 'beginner' | 'intermediate' | 'advanced') || 'intermediate',
+        estimatedTime: moduleData.estimatedTime || 30,
+        xpReward: 100,
+        isLocked: false,
+        completionRate: 0,
+        moduleType: 'lecture-room',
+        aiGenerated: true,
+        content: moduleData.content || `This is an AI-generated module about ${topic}.`
+      };
+      
+      // Add to modules list
+      setModules(prevModules => {
+        const updatedModules = [...prevModules, newModule];
+        // Save to localStorage
+        localStorage.setItem('dentalMentorModules', JSON.stringify(
+          updatedModules.filter(m => m.aiGenerated)
+        ));
+        return updatedModules;
+      });
+      
+      // Award XP for generating content
+      dispatch({ type: 'EARN_XP', payload: 15 });
+      
+      // Reset form
+      setGeneratedTopic('');
+    } catch (error) {
+      console.error('Error generating AI module:', error);
+      // Create a fallback module if AI generation fails
+      const fallbackModule = {
+        id: `ai-generated-${Date.now()}`,
+        title: `AI-Generated: ${generatedTopic || 'Dental Education'}`,
+        description: 'Personalized learning module with AI-enhanced content.',
+        icon: '🤖',
+        specialty: 'prosthodontics',
+        difficulty: 'intermediate',
+        estimatedTime: 30,
+        xpReward: 100,
+        isLocked: false,
+        completionRate: 0,
+        moduleType: 'lecture-room',
+        aiGenerated: true
+      };
+      
+      setModules(prevModules => [...prevModules, fallbackModule]);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const filteredModules = modules.filter(module => {
     const matchesSearch = module.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -201,6 +291,20 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
     } else {
       // Handle traditional module start
       console.log('Starting traditional module:', moduleId);
+      // Track module progress
+      const updatedModules = modules.map(m => {
+        if (m.id === moduleId) {
+          return {
+            ...m,
+            completionRate: m.completionRate > 0 ? m.completionRate + 10 : 10
+          };
+        }
+        return m;
+      });
+      setModules(updatedModules);
+      
+      // Award XP for starting a module
+      dispatch({ type: 'EARN_XP', payload: 5 });
     }
   };
 
@@ -272,17 +376,23 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
             </select>
           </div>
 
-          {/* Clear Filters */}
-          <button
-            onClick={() => {
-              setSearchTerm('');
-              setSelectedSpecialty('all');
-              setSelectedDifficulty('all');
-            }}
-            className="px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-          >
-            Clear Filters
-          </button>
+          {/* AI Module Generator */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Generate AI module on topic..."
+              value={generatedTopic}
+              onChange={(e) => setGeneratedTopic(e.target.value)}
+              className="w-full pl-4 pr-24 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            />
+            <button
+              onClick={generateAIModule}
+              disabled={isGenerating}
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-md text-xs font-medium"
+            >
+              {isGenerating ? 'Generating...' : 'AI Generate'}
+            </button>
+          </div>
         </div>
       </div>
 

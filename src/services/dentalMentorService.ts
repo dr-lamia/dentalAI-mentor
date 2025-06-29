@@ -69,6 +69,82 @@ class DentalMentorService {
     }
   }
 
+  // Generate learning module
+  async generateModule(topic: string, difficulty: 'beginner' | 'intermediate' | 'advanced' = 'intermediate'): Promise<any> {
+    try {
+      // Try using AI Integration Service first
+      return await aiIntegrationService.generateModule(topic, difficulty);
+    } catch (error) {
+      console.error('Error generating module via service:', error);
+      
+      // Fallback to direct Gemini API call
+      try {
+        console.log('Falling back to direct Gemini API call for module generation');
+        const contextPrompt = this.documentContext.length > 0 
+          ? `Context from uploaded documents:\n${this.documentContext.join('\n\n')}\n\n`
+          : '';
+          
+        const fullPrompt = `You are Dr. DentalMentor, an expert in dental education. Please create a comprehensive learning module about "${topic}" at ${difficulty} level.
+        
+        ${contextPrompt}
+        
+        Format the response as JSON with this structure:
+        {
+          "title": "Module title",
+          "description": "Brief module description",
+          "content": "2-3 paragraphs of educational content explaining the concept in plain language",
+          "estimatedTime": 15,
+          "questions": [
+            {
+              "question": "Practice question 1",
+              "type": "multiple-choice",
+              "options": ["Option A", "Option B", "Option C", "Option D"],
+              "correctAnswer": 0,
+              "explanation": "Explanation",
+              "points": 10
+            }
+          ],
+          "specialty": "endodontics",
+          "difficulty": "${difficulty}"
+        }`;
+        
+        const result = await this.model.generateContent(fullPrompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        // Extract JSON from response
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('Failed to generate valid module data');
+        }
+        
+        return JSON.parse(jsonMatch[0]);
+      } catch (secondError) {
+        console.error('Fallback to Gemini API also failed for module generation:', secondError);
+        
+        // Return a basic module structure as last resort
+        return {
+          title: `${topic} - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level`,
+          description: `Learning module about ${topic}`,
+          content: `This is a learning module about ${topic}. The content would typically include detailed information about this dental topic.`,
+          estimatedTime: 30,
+          questions: [
+            {
+              question: `What is a key principle of ${topic}?`,
+              type: "multiple-choice",
+              options: ["Option A", "Option B", "Option C", "Option D"],
+              correctAnswer: 0,
+              explanation: "This would explain the correct answer",
+              points: 10
+            }
+          ],
+          specialty: "general",
+          difficulty: difficulty
+        };
+      }
+    }
+  }
+
   // Provide procedure feedback using AI Integration Service
   async provideProcedureFeedback(procedure: string, userActions: string[], quality: 'poor' | 'good' | 'excellent'): Promise<string> {
     try {

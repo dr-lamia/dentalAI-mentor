@@ -21,7 +21,9 @@
     "@react-three/fiber": "^8.15.11",
     "@react-three/drei": "^9.88.13",
     "react-dropzone": "^14.2.3",
-    "three": "^0.158.0"
+    "three": "^0.158.0",
+    "react-markdown": "^8.0.7",
+    "recharts": "^2.7.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

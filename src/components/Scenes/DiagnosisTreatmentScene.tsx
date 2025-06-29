@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, FileImage, CheckCircle, XCircle, Clock, Award, Zap, AlertCircle, User, Calendar, Stethoscope } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { Question, CaseStudy } from '../../types';
+import { aiIntegrationService } from '../../services/aiIntegrationService';
 
 const DiagnosisTreatmentScene: React.FC = () => {
   const { state, dispatch } = useGame();
@@ -13,9 +14,11 @@ const DiagnosisTreatmentScene: React.FC = () => {
   const [score, setScore] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes
   const [caseResults, setCaseResults] = useState<{correct: number, incorrect: number}>({correct: 0, incorrect: 0});
+  const [isGeneratingCase, setIsGeneratingCase] = useState(false);
+  const [generatedCaseTopic, setGeneratedCaseTopic] = useState('');
 
   // Comprehensive case studies covering different specialties and scenarios
-  const caseStudies: CaseStudy[] = [
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([
     {
       id: 'case-1',
       title: 'Acute Endodontic Emergency',
@@ -223,216 +226,8 @@ const DiagnosisTreatmentScene: React.FC = () => {
           type: 'multiple-choice'
         }
       ]
-    },
-    {
-      id: 'case-5',
-      title: 'Orthodontic Malocclusion',
-      patientHistory: 'A 12-year-old patient presents for orthodontic consultation. Parents are concerned about crowded front teeth and difficulty chewing. The child is in mixed dentition with all permanent incisors and first molars erupted. No previous orthodontic treatment.',
-      clinicalFindings: [
-        'Class II molar relationship bilaterally',
-        'Overjet of 8mm',
-        'Overbite of 6mm (deep bite)',
-        'Crowding in anterior region (4mm space deficiency)',
-        'Narrow maxillary arch',
-        'Mouth breathing habit observed'
-      ],
-      labResults: ['Cephalometric analysis shows ANB angle of 7°', 'Panoramic radiograph shows all permanent teeth developing normally'],
-      images: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      xrays: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      specialty: 'orthodontics',
-      difficulty: 'medium',
-      questions: [
-        {
-          id: 'q9',
-          question: 'Based on the clinical findings, what is the primary malocclusion classification?',
-          options: [
-            'Class I malocclusion with crowding',
-            'Class II Division 1 malocclusion',
-            'Class II Division 2 malocclusion',
-            'Class III malocclusion'
-          ],
-          correctAnswer: 1,
-          explanation: 'Class II Division 1 is characterized by Class II molar relationship, increased overjet (>4mm), and often deep overbite. The large overjet of 8mm confirms this classification.',
-          specialty: 'orthodontics',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        },
-        {
-          id: 'q10',
-          question: 'What would be the most appropriate initial treatment approach?',
-          options: [
-            'Extract four premolars and begin fixed appliances',
-            'Palatal expansion followed by comprehensive orthodontics',
-            'Wait until all permanent teeth erupt',
-            'Functional appliance therapy'
-          ],
-          correctAnswer: 3,
-          explanation: 'For growing patients with Class II malocclusion, functional appliance therapy can help correct the skeletal discrepancy and improve facial profile while the patient is still growing.',
-          specialty: 'orthodontics',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        }
-      ]
-    },
-    {
-      id: 'case-6',
-      title: 'Oral Surgery Consultation',
-      patientHistory: 'A 25-year-old patient presents with pain and swelling around the lower right wisdom tooth. Symptoms started 1 week ago and have been getting progressively worse. Patient reports difficulty opening mouth and swallowing. No fever but feels generally unwell.',
-      clinicalFindings: [
-        'Partially erupted tooth #32 (mandibular right third molar)',
-        'Inflamed and swollen gingiva around tooth',
-        'Purulent discharge from gingival pocket',
-        'Limited mouth opening (25mm)',
-        'Tender submandibular lymph nodes',
-        'Halitosis present'
-      ],
-      labResults: ['Temperature: 99.8°F', 'No signs of facial cellulitis'],
-      images: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      xrays: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      specialty: 'oral-surgery',
-      difficulty: 'medium',
-      questions: [
-        {
-          id: 'q11',
-          question: 'What is the most likely diagnosis?',
-          options: [
-            'Acute pericoronitis',
-            'Periodontal abscess',
-            'Acute pulpitis',
-            'Dry socket'
-          ],
-          correctAnswer: 0,
-          explanation: 'Acute pericoronitis is inflammation of the gingiva around a partially erupted tooth, commonly affecting third molars. The symptoms of pain, swelling, purulent discharge, and trismus are characteristic.',
-          specialty: 'oral-surgery',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        },
-        {
-          id: 'q12',
-          question: 'What is the most appropriate immediate treatment?',
-          options: [
-            'Immediate extraction of the tooth',
-            'Irrigation and debridement with antibiotics',
-            'Root canal treatment',
-            'Incision and drainage only'
-          ],
-          correctAnswer: 1,
-          explanation: 'Initial treatment for acute pericoronitis includes irrigation and debridement of the area, along with antibiotics if systemic involvement is present. Extraction may be considered after acute symptoms resolve.',
-          specialty: 'oral-surgery',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        }
-      ]
-    },
-    {
-      id: 'case-7',
-      title: 'Prosthodontic Rehabilitation',
-      patientHistory: 'A 58-year-old patient presents for full mouth rehabilitation. Patient has multiple missing teeth and wants to improve function and esthetics. History of periodontal disease, now stable. Patient is a non-smoker and has well-controlled diabetes.',
-      clinicalFindings: [
-        'Missing teeth: #3, #14, #19, #30, #31',
-        'Existing crowns on #8, #9 with poor margins',
-        'Generalized moderate wear on remaining teeth',
-        'Stable periodontal condition',
-        'Adequate bone height for implants',
-        'Good oral hygiene'
-      ],
-      labResults: ['Recent HbA1c: 6.8%', 'No contraindications to dental treatment'],
-      images: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      xrays: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      specialty: 'prosthodontics',
-      difficulty: 'hard',
-      questions: [
-        {
-          id: 'q13',
-          question: 'What would be the most appropriate treatment plan for the posterior missing teeth?',
-          options: [
-            'Removable partial dentures',
-            'Implant-supported crowns',
-            'Fixed partial dentures (bridges)',
-            'No treatment needed'
-          ],
-          correctAnswer: 1,
-          explanation: 'Given the patient\'s good oral hygiene, stable periodontal condition, adequate bone, and controlled diabetes, implant-supported crowns would provide the best long-term solution for missing posterior teeth.',
-          specialty: 'prosthodontics',
-          difficulty: 'hard',
-          points: 15,
-          type: 'multiple-choice'
-        },
-        {
-          id: 'q14',
-          question: 'For the existing crowns with poor margins, what is the best approach?',
-          options: [
-            'Leave as is if asymptomatic',
-            'Replace with new crowns',
-            'Repair margins with composite',
-            'Extract teeth and place implants'
-          ],
-          correctAnswer: 1,
-          explanation: 'Poor crown margins can lead to recurrent decay and periodontal problems. In a comprehensive treatment plan, these should be replaced with properly fitting crowns.',
-          specialty: 'prosthodontics',
-          difficulty: 'hard',
-          points: 15,
-          type: 'multiple-choice'
-        }
-      ]
-    },
-    {
-      id: 'case-8',
-      title: 'Dental Radiology Interpretation',
-      patientHistory: 'A 35-year-old patient presents for routine examination. No symptoms reported. Patient has a history of orthodontic treatment completed 5 years ago. Regular dental visits every 6 months with good oral hygiene.',
-      clinicalFindings: [
-        'All teeth present and in good alignment',
-        'No visible caries on clinical examination',
-        'Healthy gingiva with no bleeding on probing',
-        'No mobility or percussion sensitivity',
-        'Patient reports no pain or sensitivity',
-        'Routine bitewing radiographs taken'
-      ],
-      labResults: ['Bitewing radiographs show radiolucency between #13 and #14', 'No other radiographic abnormalities noted'],
-      images: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      xrays: ['https://images.pexels.com/photos/6812540/pexels-photo-6812540.jpeg'],
-      specialty: 'radiology',
-      difficulty: 'medium',
-      questions: [
-        {
-          id: 'q15',
-          question: 'What is the most likely explanation for the radiolucency between #13 and #14?',
-          options: [
-            'Interproximal caries',
-            'Cervical burnout',
-            'External root resorption',
-            'Periodontal bone loss'
-          ],
-          correctAnswer: 0,
-          explanation: 'A radiolucency between teeth on bitewing radiographs most commonly represents interproximal caries, especially when clinical examination doesn\'t reveal obvious cavitation.',
-          specialty: 'radiology',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        },
-        {
-          id: 'q16',
-          question: 'What is the most appropriate next step?',
-          options: [
-            'Continue monitoring at next visit',
-            'Clinical examination with explorer',
-            'Take additional radiographs',
-            'Restore both teeth immediately'
-          ],
-          correctAnswer: 1,
-          explanation: 'When radiographic caries is suspected but not clinically visible, careful clinical examination with appropriate instruments can help confirm the diagnosis and determine treatment needs.',
-          specialty: 'radiology',
-          difficulty: 'medium',
-          points: 10,
-          type: 'multiple-choice'
-        }
-      ]
     }
-  ];
+  ]);
 
   useEffect(() => {
     if (currentCase && timeRemaining > 0) {
@@ -515,6 +310,38 @@ const DiagnosisTreatmentScene: React.FC = () => {
     setShowExplanation(false);
   };
 
+  const generateAICase = async () => {
+    setIsGeneratingCase(true);
+    try {
+      // Generate a random topic if none is provided
+      const topics = [
+        'Endodontic Emergency', 
+        'Periodontal Disease', 
+        'Dental Trauma',
+        'Oral Pathology',
+        'Prosthodontic Rehabilitation'
+      ];
+      const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+      const topic = generatedCaseTopic || randomTopic;
+      
+      // Use AI service to generate case study
+      const caseStudy = await aiIntegrationService.generateCaseStudy(topic, 'medium');
+      
+      // Add to case studies
+      setCaseStudies(prev => [...prev, caseStudy]);
+      
+      // Award XP for generating content
+      dispatch({ type: 'EARN_XP', payload: 15 });
+      
+      // Reset form
+      setGeneratedCaseTopic('');
+    } catch (error) {
+      console.error('Error generating AI case study:', error);
+    } finally {
+      setIsGeneratingCase(false);
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -556,6 +383,48 @@ const DiagnosisTreatmentScene: React.FC = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Clinical Case Studies</h1>
             <p className="text-gray-600 text-lg">Analyze diverse clinical cases across all dental specialties to develop your diagnostic skills</p>
+          </div>
+
+          {/* AI Case Generator */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">AI Case Generator</h3>
+                <p className="text-sm text-gray-600">Create personalized clinical cases for practice</p>
+              </div>
+            </div>
+            
+            <div className="flex items-end gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Case Topic
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Endodontic Emergency, Oral Lesion..."
+                  value={generatedCaseTopic}
+                  onChange={(e) => setGeneratedCaseTopic(e.target.value)}
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <button
+                onClick={generateAICase}
+                disabled={isGeneratingCase}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {isGeneratingCase ? (
+                  <>
+                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <span>Generate AI Case</span>
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

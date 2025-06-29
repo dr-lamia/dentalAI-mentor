@@ -136,6 +136,35 @@ class AIIntegrationService {
     }
   }
 
+  // Generate a learning module
+  async generateModule(topic: string, difficulty: string = 'intermediate'): Promise<any> {
+    try {
+      // For development, return a mock response if the API is not available
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Using mock response for generateModule in development mode');
+        return this.getMockModule(topic, difficulty);
+      }
+
+      const response = await fetch(`${this.baseUrl}/ai/generate_module?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.geminiApiKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const moduleData = await response.json();
+      return moduleData;
+    } catch (error) {
+      console.error('Error generating module:', error);
+      // Fallback to mock module in case of error
+      return this.getMockModule(topic, difficulty);
+    }
+  }
+
   // Answer Validation - Connect to POST /validate_answer
   async validateAnswer(questionId: string, answer: number | string, studentId: string): Promise<{isCorrect: boolean, score: number, feedback: string}> {
     try {
@@ -498,6 +527,219 @@ class AIIntegrationService {
       })),
       specialty: topic.toLowerCase().replace(/\s+/g, '-'),
       difficulty: difficulty as 'easy' | 'medium' | 'hard'
+    };
+  }
+
+  private getMockModule(topic: string, difficulty: string): any {
+    // Generate a mock module based on the topic
+    let content = "";
+    let questions = [];
+    
+    if (topic.toLowerCase().includes('endodontic') || topic.toLowerCase().includes('root canal')) {
+      content = `# Root Canal Therapy: Principles and Techniques
+
+## Introduction
+Root canal therapy, or endodontic treatment, is a procedure designed to eliminate infection and protect the decontaminated tooth from future microbial invasion. It involves removing the infected or inflamed pulp tissue, carefully cleaning and shaping the root canal system, and then filling and sealing the space.
+
+## Anatomy and Access
+Understanding pulp chamber and root canal anatomy is crucial for successful treatment. The access cavity should provide straight-line access to the canal orifices while conserving tooth structure. For anterior teeth, access is typically triangular or oval, while posterior teeth require more rectangular or rhomboidal access designs.
+
+## Cleaning and Shaping
+The primary goals of cleaning and shaping are to:
+1. Remove all pulp tissue, bacteria, and their byproducts
+2. Create a continuously tapering preparation from crown to apex
+3. Maintain the original canal path
+4. Keep the apical foramen in its original position
+5. Create a sufficient apical constriction
+
+Modern techniques utilize nickel-titanium rotary instruments that maintain canal curvature while efficiently removing debris. Irrigation with sodium hypochlorite is essential for dissolving organic tissue and eliminating bacteria.
+
+## Obturation
+The goal of obturation is to create a fluid-tight seal along the length of the root canal system. The most common technique uses gutta-percha with a sealer. The thermoplastic technique allows the material to adapt to the irregularities of the canal system, creating a three-dimensional fill.
+
+## Restoration
+After root canal treatment, the tooth must be properly restored to prevent reinfection and fracture. Posterior teeth generally require cuspal coverage with a crown, while anterior teeth may be restored with composite resin if sufficient tooth structure remains.`;
+      
+      questions = [
+        {
+          question: "What is the primary goal of cleaning and shaping in endodontic treatment?",
+          type: "multiple-choice",
+          options: [
+            "To create a perfectly round canal",
+            "To remove all pulp tissue, bacteria, and their byproducts",
+            "To enlarge the canal as much as possible",
+            "To create multiple apical foramina"
+          ],
+          correctAnswer: 1,
+          explanation: "The primary goal of cleaning and shaping is to remove all pulp tissue, bacteria, and their byproducts while creating a continuously tapering preparation that maintains the original canal path.",
+          points: 10
+        },
+        {
+          question: "Why is proper restoration after root canal treatment important?",
+          type: "multiple-choice",
+          options: [
+            "It's purely for esthetic purposes",
+            "It prevents reinfection and fracture of the tooth",
+            "It's required by insurance companies",
+            "It makes the tooth stronger than before treatment"
+          ],
+          correctAnswer: 1,
+          explanation: "Proper restoration after root canal treatment is essential to prevent reinfection of the canal system and to protect the tooth from fracture, as endodontically treated teeth are more susceptible to fracture.",
+          points: 10
+        }
+      ];
+    } else if (topic.toLowerCase().includes('crown') || topic.toLowerCase().includes('prosthodontic')) {
+      content = `# Crown Preparation: Principles and Techniques
+
+## Introduction
+Crown preparation is a critical procedure in restorative dentistry that involves the reduction of tooth structure to accommodate a full-coverage restoration. The success of the final restoration depends largely on the quality of the preparation, which must balance biological, mechanical, and esthetic considerations.
+
+## Preparation Principles
+Successful crown preparations adhere to several key principles:
+1. **Conservation of tooth structure**: Remove only what is necessary for the restoration
+2. **Retention and resistance form**: Create features that prevent dislodgment
+3. **Structural durability**: Ensure sufficient thickness for the restorative material
+4. **Marginal integrity**: Create precise, smooth margins for optimal fit
+5. **Preservation of periodontium**: Maintain gingival health
+
+## Preparation Techniques
+### Occlusal/Incisal Reduction
+- For metal: 1.0-1.5mm
+- For metal-ceramic: 1.5-2.0mm
+- For all-ceramic: 1.5-2.0mm
+
+### Axial Reduction
+- For metal: 0.5-1.0mm
+- For metal-ceramic: 1.0-1.5mm
+- For all-ceramic: 1.0-1.5mm
+
+### Taper
+The ideal taper is 6-8° total convergence angle (3-4° per wall). Excessive taper reduces retention, while insufficient taper prevents proper seating.
+
+### Margin Design
+- **Chamfer**: Suitable for metal and zirconia crowns
+- **Heavy chamfer**: For metal-ceramic and lithium disilicate
+- **Shoulder**: For traditional all-ceramic crowns
+- **Knife-edge**: Occasionally used for supragingival margins on molars
+
+## Common Errors
+1. Insufficient reduction leading to over-contoured or weak restorations
+2. Excessive taper reducing retention
+3. Rough or irregular margins
+4. Sharp internal line angles creating stress concentration
+5. Damage to adjacent teeth
+
+## Digital Workflow
+Modern crown preparation can be integrated with digital workflows using intraoral scanners, CAD software, and milling machines. This approach offers advantages in precision, efficiency, and patient comfort.`;
+      
+      questions = [
+        {
+          question: "What is the ideal total convergence angle for crown preparations?",
+          type: "multiple-choice",
+          options: [
+            "2-4°",
+            "6-8°",
+            "12-15°",
+            "20-25°"
+          ],
+          correctAnswer: 1,
+          explanation: "The ideal taper is 6-8° total convergence angle (3-4° per wall). Excessive taper reduces retention, while insufficient taper prevents proper seating of the crown.",
+          points: 10
+        },
+        {
+          question: "Which margin design is most appropriate for a zirconia crown?",
+          type: "multiple-choice",
+          options: [
+            "Knife-edge",
+            "Chamfer",
+            "Heavy chamfer",
+            "Shoulder with bevel"
+          ],
+          correctAnswer: 1,
+          explanation: "A chamfer margin is most appropriate for zirconia crowns. It provides adequate strength while conserving tooth structure compared to a shoulder preparation.",
+          points: 10
+        }
+      ];
+    } else {
+      content = `# ${topic}: Comprehensive Overview
+
+## Introduction
+${topic} represents an important area of dental practice that requires thorough understanding of both theoretical concepts and clinical applications. This module provides a comprehensive overview of the key principles, diagnostic approaches, and treatment modalities.
+
+## Key Concepts
+Understanding the fundamental concepts of ${topic} is essential for accurate diagnosis and effective treatment planning. These include:
+
+1. **Anatomical Considerations**: The structural and functional aspects relevant to ${topic}
+2. **Pathophysiology**: The mechanisms of disease development and progression
+3. **Classification Systems**: Standardized approaches to categorizing conditions
+4. **Evidence-Based Protocols**: Current best practices supported by research
+
+## Diagnostic Approach
+A systematic diagnostic approach for ${topic} includes:
+
+1. **Comprehensive History**: Medical, dental, and specific condition-related information
+2. **Clinical Examination**: Visual inspection, palpation, and specialized tests
+3. **Radiographic Assessment**: Appropriate imaging modalities and interpretation
+4. **Additional Testing**: Laboratory tests or specialized diagnostic procedures when indicated
+
+## Treatment Planning
+Effective treatment planning for ${topic} should consider:
+
+1. **Patient-Centered Approach**: Addressing patient concerns, expectations, and preferences
+2. **Risk-Benefit Analysis**: Weighing potential benefits against risks for each option
+3. **Staged Treatment**: Prioritizing interventions based on urgency and logical sequence
+4. **Interdisciplinary Collaboration**: Involving specialists when appropriate
+
+## Clinical Techniques
+The clinical management of ${topic} involves various techniques that must be performed with precision and attention to detail. These techniques have evolved with advances in technology and materials.
+
+## Long-Term Management
+Successful outcomes in ${topic} depend not only on initial treatment but also on:
+
+1. **Maintenance Protocols**: Regular follow-up and preventive measures
+2. **Complication Management**: Early identification and intervention for complications
+3. **Patient Education**: Empowering patients with knowledge for self-care`;
+      
+      questions = [
+        {
+          question: `What is a key component of the diagnostic approach for ${topic}?`,
+          type: "multiple-choice",
+          options: [
+            "Comprehensive history and clinical examination",
+            "Immediate treatment without diagnosis",
+            "Referral to specialists in all cases",
+            "Exclusive reliance on patient self-reporting"
+          ],
+          correctAnswer: 0,
+          explanation: `A comprehensive history and thorough clinical examination form the foundation of the diagnostic approach for ${topic}. This provides essential information for accurate diagnosis and appropriate treatment planning.`,
+          points: 10
+        },
+        {
+          question: `Which of the following is most important for long-term success in ${topic}?`,
+          type: "multiple-choice",
+          options: [
+            "Regular maintenance and follow-up",
+            "Using the most expensive materials",
+            "Treatment by specialists only",
+            "Avoiding all patient education"
+          ],
+          correctAnswer: 0,
+          explanation: `Regular maintenance and follow-up are crucial for long-term success in ${topic}. This allows for monitoring of treatment outcomes, early detection of potential issues, and timely intervention when necessary.`,
+          points: 10
+        }
+      ];
+    }
+    
+    return {
+      title: `${topic} - ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level`,
+      description: `Comprehensive learning module about ${topic} with interactive content and practice questions.`,
+      content: content,
+      estimatedTime: topic.toLowerCase().includes('crown') ? 45 : topic.toLowerCase().includes('endodontic') ? 60 : 30,
+      questions: questions,
+      specialty: topic.toLowerCase().includes('endodontic') ? 'endodontics' : 
+                topic.toLowerCase().includes('crown') || topic.toLowerCase().includes('prosthodontic') ? 'prosthodontics' : 
+                topic.toLowerCase().includes('perio') ? 'periodontics' : 'general',
+      difficulty: difficulty
     };
   }
 

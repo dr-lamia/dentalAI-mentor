@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Beaker, Palette, Zap, CheckCircle, AlertTriangle, Settings, Award } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { Material } from '../../types';
+import { aiIntegrationService } from '../../services/aiIntegrationService';
 
 const LaboratoryScene: React.FC = () => {
   const { state, dispatch } = useGame();
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
   const [currentStep, setCurrentStep] = useState<'material-selection' | 'design' | 'milling' | 'finishing'>('material-selection');
   const [patientCase, setPatientCase] = useState({
+    id: `case-${Date.now()}`,
     age: 45,
     tooth: '#8 (Maxillary Central Incisor)',
     requirements: ['High esthetics', 'Anterior region', 'Normal occlusion'],
@@ -22,6 +24,7 @@ const LaboratoryScene: React.FC = () => {
   });
   const [millingProgress, setMillingProgress] = useState(0);
   const [feedback, setFeedback] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const materials: Material[] = [
     {
@@ -81,6 +84,44 @@ const LaboratoryScene: React.FC = () => {
       cost: 'low'
     }
   ];
+
+  // AI-powered material recommendation
+  const getMaterialRecommendation = async () => {
+    setIsAnalyzing(true);
+    try {
+      const recommendation = await aiIntegrationService.recommendMaterial(patientCase.id);
+      setFeedback(recommendation.recommendation || 'Based on the case requirements, Lithium Disilicate would be the optimal choice for this anterior restoration due to its excellent esthetics and adequate strength.');
+      dispatch({ type: 'EARN_XP', payload: 10 });
+    } catch (error) {
+      console.error('Error getting material recommendation:', error);
+      setFeedback('Unable to get material recommendation at this time. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // AI-powered design review
+  const reviewDesign = async () => {
+    if (!selectedMaterial) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const designData = {
+        material: selectedMaterial.type,
+        parameters: designParameters,
+        caseDetails: patientCase
+      };
+      
+      const feedback = await aiIntegrationService.reviewDesign(designData);
+      setFeedback(feedback);
+      dispatch({ type: 'EARN_XP', payload: 15 });
+    } catch (error) {
+      console.error('Error reviewing design:', error);
+      setFeedback('Unable to review design at this time. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleMaterialSelect = (material: Material) => {
     setSelectedMaterial(material);
@@ -189,6 +230,29 @@ const LaboratoryScene: React.FC = () => {
             </ul>
           </div>
 
+          {/* AI Material Recommendation */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-900">AI Recommendation</h3>
+              <button
+                onClick={getMaterialRecommendation}
+                disabled={isAnalyzing}
+                className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs hover:bg-purple-200 transition-colors"
+              >
+                {isAnalyzing ? 'Loading...' : 'Get Recommendation'}
+              </button>
+            </div>
+            {feedback ? (
+              <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                <p className="text-sm text-purple-800 leading-relaxed">{feedback}</p>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
+                <p className="text-sm text-gray-500">Click to get AI material recommendation</p>
+              </div>
+            )}
+          </div>
+
           {/* Current Step */}
           <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl p-4 text-white">
             <h3 className="font-semibold mb-2">Current Step</h3>
@@ -216,18 +280,6 @@ const LaboratoryScene: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {/* Feedback */}
-          {feedback && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-50 rounded-xl p-4 border border-gray-200"
-            >
-              <h4 className="font-semibold text-gray-900 mb-2">Lab Technician Feedback</h4>
-              <p className="text-sm text-gray-700 leading-relaxed">{feedback}</p>
-            </motion.div>
-          )}
         </div>
       </div>
 
@@ -383,6 +435,36 @@ const LaboratoryScene: React.FC = () => {
                           <option value="over-contoured">Over-contoured</option>
                         </select>
                       </div>
+
+                      {/* AI Design Review Button */}
+                      <button
+                        onClick={reviewDesign}
+                        disabled={isAnalyzing}
+                        className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      >
+                        {isAnalyzing ? (
+                          <>
+                            <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                            <span>Reviewing Design...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-5 h-5" />
+                            <span>Review Design</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* AI Design Feedback */}
+                      {feedback && (
+                        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                          <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
+                            <Award className="w-4 h-4 mr-2" />
+                            AI Design Review
+                          </h4>
+                          <p className="text-blue-800 text-sm leading-relaxed">{feedback}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -419,16 +501,14 @@ const LaboratoryScene: React.FC = () => {
                         <span className="text-sm text-gray-900 capitalize">{designParameters.margin}</span>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                <div className="text-center">
-                  <button
-                    onClick={startMilling}
-                    className="px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-xl hover:from-purple-600 hover:to-blue-700 transition-all duration-200 font-medium text-lg"
-                  >
-                    Start Virtual Milling
-                  </button>
+                    <button
+                      onClick={startMilling}
+                      className="w-full mt-6 py-3 px-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all duration-200 font-medium"
+                    >
+                      Proceed to Milling
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
