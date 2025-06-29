@@ -11,3 +11,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[build.environment]
+  VITE_GOOGLE_AI_API_KEY = "AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s"
