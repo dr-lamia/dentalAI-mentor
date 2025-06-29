@@ -9,6 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-i
 // Create demo accounts on server start
 const createDemoAccounts = async () => {
   try {
+    console.log('🔄 Checking for demo accounts...');
+    
     // Check if demo accounts already exist
     const studentExists = await User.findOne({ email: 'student@demo.com' });
     const teacherExists = await User.findOne({ email: 'teacher@demo.com' });
@@ -37,7 +39,9 @@ const createDemoAccounts = async () => {
         ]
       });
       await demoStudent.save();
-      console.log('✅ Demo student account created');
+      console.log('✅ Demo student account created: student@demo.com / password123');
+    } else {
+      console.log('✅ Demo student account already exists');
     }
 
     if (!teacherExists) {
@@ -64,15 +68,14 @@ const createDemoAccounts = async () => {
         ]
       });
       await demoTeacher.save();
-      console.log('✅ Demo teacher account created');
+      console.log('✅ Demo teacher account created: teacher@demo.com / password123');
+    } else {
+      console.log('✅ Demo teacher account already exists');
     }
   } catch (error) {
-    console.error('Error creating demo accounts:', error);
+    console.error('❌ Error creating demo accounts:', error.message);
   }
 };
-
-// Initialize demo accounts
-createDemoAccounts();
 
 // Register
 router.post('/register', async (req, res) => {
@@ -245,5 +248,8 @@ router.get('/me', async (req, res) => {
 router.post('/logout', (req, res) => {
   res.json({ message: 'Logout successful' });
 });
+
+// Initialize demo accounts when the module is loaded
+setTimeout(createDemoAccounts, 2000); // Wait 2 seconds for DB connection
 
 export default router;

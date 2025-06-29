@@ -11,17 +11,10 @@ import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
+// Import routes
 import authRoutes from './routes/auth.js';
-import userRoutes from './routes/users.js';
-import quizRoutes from './routes/quizzes.js';
-import moduleRoutes from './routes/modules.js';
-import caseStudyRoutes from './routes/caseStudies.js';
-import sessionRoutes from './routes/sessions.js';
-import leaderboardRoutes from './routes/leaderboard.js';
-import uploadRoutes from './routes/uploads.js';
-import { authenticateToken, authorizeRole } from './middleware/auth.js';
-import { setupSocketHandlers } from './socket/handlers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,22 +40,21 @@ const connectDB = async () => {
     if (process.env.NODE_ENV === 'production' && process.env.MONGODB_URI) {
       // Use real MongoDB in production
       await mongoose.connect(process.env.MONGODB_URI);
-      console.log('Connected to MongoDB (Production)');
+      console.log('✅ Connected to MongoDB (Production)');
     } else {
       // Use MongoDB Memory Server for development
+      console.log('🔄 Starting MongoDB Memory Server...');
       mongoServer = await MongoMemoryServer.create();
       const mongoUri = mongoServer.getUri();
       await mongoose.connect(mongoUri);
-      console.log('Connected to MongoDB Memory Server (Development)');
+      console.log('✅ Connected to MongoDB Memory Server (Development)');
+      console.log('📍 Database URI:', mongoUri);
     }
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('❌ MongoDB connection error:', error);
     process.exit(1);
   }
 };
-
-// Connect to database
-await connectDB();
 
 // Security middleware
 app.use(helmet({
@@ -88,7 +80,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Create uploads directory if it doesn't exist
-import fs from 'fs';
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -99,13 +90,19 @@ app.use('/uploads', express.static(uploadsDir));
 
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', authenticateToken, userRoutes);
-app.use('/api/quizzes', authenticateToken, quizRoutes);
-app.use('/api/modules', authenticateToken, moduleRoutes);
-app.use('/api/case-studies', authenticateToken, caseStudyRoutes);
-app.use('/api/sessions', authenticateToken, sessionRoutes);
-app.use('/api/leaderboard', authenticateToken, leaderboardRoutes);
-app.use('/api/uploads', authenticateToken, uploadRoutes);
+
+// Basic API info endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'DentalMentor API Server',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      auth: '/api/auth',
+      health: '/api/health'
+    }
+  });
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -113,13 +110,14 @@ app.get('/api/health', (req, res) => {
     status: 'OK', 
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    memory: process.memoryUsage()
   });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Server Error:', err.stack);
   res.status(500).json({ 
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
@@ -131,15 +129,21 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Socket.IO setup
-setupSocketHandlers(io);
+// Socket.IO setup (basic for now)
+io.on('connection', (socket) => {
+  console.log('👤 User connected:', socket.id);
+  
+  socket.on('disconnect', () => {
+    console.log('👤 User disconnected:', socket.id);
+  });
+});
 
 // Make io available to routes
 app.set('io', io);
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('Shutting down gracefully...');
+  console.log('🔄 Shutting down gracefully...');
   
   if (mongoServer) {
     await mongoServer.stop();
@@ -147,16 +151,39 @@ process.on('SIGINT', async () => {
   
   await mongoose.connection.close();
   server.close(() => {
-    console.log('Server closed');
+    console.log('✅ Server closed');
     process.exit(0);
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Database: ${mongoServer ? 'MongoDB Memory Server' : 'MongoDB'}`);
-  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
-});
+// Start server
+const startServer = async () => {
+  try {
+    // Connect to database first
+    await connectDB();
+    
+    // Start server
+    server.listen(PORT, () => {
+      console.log('\n🚀 DentalMentor Server Started Successfully!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(`📍 Server URL: http://localhost:${PORT}`);
+      console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
+      console.log(`🔐 Auth Endpoint: http://localhost:${PORT}/api/auth`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+      console.log(`🔑 JWT Secret: ${JWT_SECRET.substring(0, 10)}...`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('\n📋 Demo Accounts:');
+      console.log('   Student: student@demo.com / password123');
+      console.log('   Teacher: teacher@demo.com / password123');
+      console.log('\n✅ Server is ready to accept connections!');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;
