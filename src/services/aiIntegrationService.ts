@@ -6,7 +6,7 @@ class AIIntegrationService {
   // Chat & Q&A - Hook "Ask Tutor" buttons to POST /ask
   async askTutor(question: string, context?: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/ask`, {
+      const response = await fetch(`${this.baseUrl}/ai/ask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ class AIIntegrationService {
   // Quiz Generation - Link to GET /generate_quiz?topic={selectedTopic}
   async generateQuiz(topic: string, difficulty: string = 'medium', numQuestions: number = 5): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/generate_quiz?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}&num_questions=${numQuestions}`, {
+      const response = await fetch(`${this.baseUrl}/ai/generate_quiz?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}&num_questions=${numQuestions}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.geminiApiKey}`
@@ -75,7 +75,7 @@ class AIIntegrationService {
   // Case Study Generation - Link to GET /generate_case?topic={selectedTopic}
   async generateCaseStudy(topic: string, difficulty: string = 'medium'): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/generate_case?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`, {
+      const response = await fetch(`${this.baseUrl}/ai/generate_case?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.geminiApiKey}`
@@ -118,7 +118,7 @@ class AIIntegrationService {
   // Answer Validation - Connect to POST /validate_answer
   async validateAnswer(questionId: string, answer: number | string, studentId: string): Promise<{isCorrect: boolean, score: number, feedback: string}> {
     try {
-      const response = await fetch(`${this.baseUrl}/validate_answer`, {
+      const response = await fetch(`${this.baseUrl}/ai/validate_answer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ class AIIntegrationService {
   // Tooth Preparation Analysis - Map to POST /analyze_prep
   async analyzePreparation(meshData: any, measurements: any): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/analyze_prep`, {
+      const response = await fetch(`${this.baseUrl}/ai/analyze_prep`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ class AIIntegrationService {
   // Material Recommendation - Wire to GET /recommend_material?caseId={caseId}
   async recommendMaterial(caseId: string): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/recommend_material?caseId=${encodeURIComponent(caseId)}`, {
+      const response = await fetch(`${this.baseUrl}/ai/recommend_material?caseId=${encodeURIComponent(caseId)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.geminiApiKey}`
@@ -203,7 +203,7 @@ class AIIntegrationService {
   // Design Review - Bind to POST /review_design
   async reviewDesign(designData: any): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/review_design`, {
+      const response = await fetch(`${this.baseUrl}/ai/review_design`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ class AIIntegrationService {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${this.baseUrl}/upload`, {
+      const response = await fetch(`${this.baseUrl}/ai/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.geminiApiKey}`

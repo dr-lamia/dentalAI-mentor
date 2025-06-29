@@ -15,6 +15,7 @@ import fs from 'fs';
 
 // Import routes
 import authRoutes from './routes/auth.js';
+import aiRoutes from './routes/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,8 +89,30 @@ if (!fs.existsSync(uploadsDir)) {
 // Static file serving for uploads
 app.use('/uploads', express.static(uploadsDir));
 
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Add multer middleware to AI routes
+app.use('/api/ai/upload', upload.single('file'));
+
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Basic API info endpoint
 app.get('/api', (req, res) => {
@@ -99,6 +122,7 @@ app.get('/api', (req, res) => {
     status: 'running',
     endpoints: {
       auth: '/api/auth',
+      ai: '/api/ai',
       health: '/api/health'
     }
   });
@@ -169,6 +193,7 @@ const startServer = async () => {
       console.log(`📍 Server URL: http://localhost:${PORT}`);
       console.log(`🏥 Health Check: http://localhost:${PORT}/api/health`);
       console.log(`🔐 Auth Endpoint: http://localhost:${PORT}/api/auth`);
+      console.log(`🤖 AI Endpoint: http://localhost:${PORT}/api/ai`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
       console.log(`🔑 JWT Secret: ${JWT_SECRET.substring(0, 10)}...`);
