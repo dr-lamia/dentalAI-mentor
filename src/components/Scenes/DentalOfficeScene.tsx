@@ -1,6 +1,6 @@
-import React, { useState, useRef, Suspense, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, useGLTF, Environment } from '@react-three/drei';
+import React, { useState, useRef, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Text } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import { Wrench, CheckCircle, AlertTriangle, RotateCcw, Zap } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
@@ -47,36 +47,6 @@ const RealisticToothModel = ({
     }
   };
 
-  // Create a realistic tooth model
-  const createToothGeometry = () => {
-    let toothGeometry;
-    
-    // Different tooth types
-    if (toothType === 'molar') {
-      // Create a more complex molar shape
-      const crownGeometry = new THREE.CylinderGeometry(1.1, 0.9, 1.8, 12);
-      const rootGeometry = new THREE.CylinderGeometry(0.7, 0.4, 1.6, 12);
-      
-      // Position the root below the crown
-      const root = new THREE.Mesh(rootGeometry);
-      root.position.y = -1.7;
-      
-      // Combine geometries
-      const crownBSP = new THREE.Mesh(crownGeometry);
-      toothGeometry = crownGeometry;
-    } else if (toothType === 'premolar') {
-      // Create a premolar shape
-      const crownGeometry = new THREE.CylinderGeometry(0.9, 0.8, 1.6, 12);
-      toothGeometry = crownGeometry;
-    } else {
-      // Create an incisor shape
-      const crownGeometry = new THREE.CylinderGeometry(0.7, 0.6, 2.0, 12);
-      toothGeometry = crownGeometry;
-    }
-    
-    return toothGeometry;
-  };
-
   return (
     <group 
       position={position} 
@@ -84,10 +54,9 @@ const RealisticToothModel = ({
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={isSelected ? 1.2 : hovered ? 1.05 : 1}
-      ref={meshRef}
     >
       {/* Main Crown - More anatomical shape */}
-      <group>
+      <group ref={meshRef}>
         {/* Central crown body with natural taper */}
         <mesh>
           <cylinderGeometry args={[0.9, 1.1, 1.8, 12]} />
@@ -467,7 +436,7 @@ const DentalOfficeScene = () => {
           <Suspense fallback={null}>
             {/* Enhanced Lighting for realistic appearance */}
             <ambientLight intensity={0.4} />
-            <directionalLight position={[10, 10, 5]} intensity={1.2} castShadow />
+            <directionalLight position={[10, 10, 5]} intensity={1.2} />
             <pointLight position={[5, 8, 5]} intensity={0.8} />
             <pointLight position={[-5, 8, 5]} intensity={0.6} />
             <spotLight 
@@ -475,7 +444,6 @@ const DentalOfficeScene = () => {
               angle={0.3} 
               penumbra={0.1} 
               intensity={1.5}
-              castShadow
             />
             
             {/* Scene Title */}
@@ -504,7 +472,7 @@ const DentalOfficeScene = () => {
             ))}
             
             {/* Dental chair/base with better materials */}
-            <mesh position={[0, -2.5, 0]} receiveShadow>
+            <mesh position={[0, -2.5, 0]}>
               <boxGeometry args={[10, 0.3, 4]} />
               <meshStandardMaterial 
                 color="#2c3e50" 
@@ -522,9 +490,6 @@ const DentalOfficeScene = () => {
               <boxGeometry args={[0.5, 8, 0.5]} />
               <meshStandardMaterial color="#34495e" />
             </mesh>
-            
-            {/* Environment lighting for realistic reflections */}
-            <Environment preset="studio" />
             
             {/* Controls */}
             <OrbitControls 

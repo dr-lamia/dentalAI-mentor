@@ -597,46 +597,37 @@ class AIIntegrationService {
   private getMockDesignReview(designData: any): string {
     const { material, parameters } = designData;
     
-    let feedback = `Design Review for ${material.type} Crown:\n\n`;
+    let feedback = `Design Review for ${material?.type || 'Crown'}:\n\n`;
     
     // Wall thickness
-    if (parameters.thickness < 1.0) {
-      feedback += "❌ Wall thickness of " + parameters.thickness + "mm is insufficient for " + material.type + ". Recommended minimum is 1.0-1.5mm depending on location.\n\n";
-    } else if (parameters.thickness > 2.0 && material.type !== 'zirconia') {
+    if (parameters?.thickness < 1.0) {
+      feedback += "❌ Wall thickness of " + parameters.thickness + "mm is insufficient. Recommended minimum is 1.0-1.5mm depending on location.\n\n";
+    } else if (parameters?.thickness > 2.0) {
       feedback += "⚠️ Wall thickness of " + parameters.thickness + "mm is excessive and may require unnecessary tooth reduction.\n\n";
     } else {
-      feedback += "✅ Wall thickness of " + parameters.thickness + "mm is appropriate for " + material.type + ".\n\n";
+      feedback += "✅ Wall thickness of " + (parameters?.thickness || 1.5) + "mm is appropriate.\n\n";
     }
     
     // Margin design
-    if (material.type === 'lithium-disilicate' && parameters.margin === 'knife-edge') {
-      feedback += "❌ Knife-edge margin is not recommended for lithium disilicate due to risk of edge chipping.\n\n";
-    } else if (material.type === 'zirconia' && parameters.margin === 'shoulder') {
-      feedback += "⚠️ Shoulder margin for zirconia requires more tooth reduction than necessary. Consider a chamfer instead.\n\n";
+    if (parameters?.margin === 'knife-edge') {
+      feedback += "❌ Knife-edge margin is not recommended due to risk of edge chipping.\n\n";
+    } else if (parameters?.margin === 'shoulder') {
+      feedback += "⚠️ Shoulder margin requires more tooth reduction than necessary. Consider a chamfer instead.\n\n";
     } else {
-      feedback += "✅ " + parameters.margin + " margin design is appropriate for " + material.type + ".\n\n";
+      feedback += "✅ " + (parameters?.margin || 'chamfer') + " margin design is appropriate.\n\n";
     }
     
     // Contour
-    if (parameters.contour === 'over-contoured') {
+    if (parameters?.contour === 'over-contoured') {
       feedback += "⚠️ Over-contoured design may compromise periodontal health and esthetics.\n\n";
-    } else if (parameters.contour === 'reduced' && material.type === 'lithium-disilicate') {
-      feedback += "✅ Reduced contour is good for lithium disilicate to ensure adequate thickness in functional areas.\n\n";
+    } else if (parameters?.contour === 'reduced') {
+      feedback += "✅ Reduced contour is good to ensure adequate thickness in functional areas.\n\n";
     } else {
-      feedback += "✅ " + parameters.contour + " contour is appropriate for this restoration.\n\n";
+      feedback += "✅ " + (parameters?.contour || 'natural') + " contour is appropriate for this restoration.\n\n";
     }
     
     // Overall assessment
-    if (parameters.thickness >= 1.0 && 
-        !(material.type === 'lithium-disilicate' && parameters.margin === 'knife-edge') && 
-        parameters.contour !== 'over-contoured') {
-      feedback += "🎉 Overall assessment: Excellent design! The parameters are appropriate for the selected material.";
-    } else if (parameters.thickness >= 0.8 && 
-               !(material.type === 'lithium-disilicate' && parameters.margin === 'knife-edge')) {
-      feedback += "👍 Overall assessment: Good design with minor issues. Consider refining the areas mentioned above.";
-    } else {
-      feedback += "⚠️ Overall assessment: Design needs significant improvement. Focus on the critical issues mentioned above.";
-    }
+    feedback += "🎉 Overall assessment: Good design! Consider the suggestions above for optimal results.";
     
     return feedback;
   }
