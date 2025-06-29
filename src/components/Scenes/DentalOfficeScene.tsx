@@ -1,32 +1,82 @@
-import React, { useState, useRef, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Sphere, Cylinder, Box } from '@react-three/drei';
+import React, { useState, useRef, Suspense, useEffect } from 'react';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { OrbitControls, Text, useGLTF, Environment } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import { Wrench, CheckCircle, AlertTriangle, RotateCcw, Zap } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { aiIntegrationService } from '../../services/aiIntegrationService';
 import * as THREE from 'three';
 
-interface ToothModelProps {
-  position: [number, number, number];
-  isSelected: boolean;
-  onClick: () => void;
-  preparationQuality: 'poor' | 'good' | 'excellent';
-  currentTool: string;
-  preparationProgress: any;
-}
+// Import realistic tooth models
+const TOOTH_MODELS = {
+  'molar': 'https://sketchfab.com/3d-models/dental-tooth-anatomy-d6c1d500713d42c59ddd4f56c4b792f0/download',
+  'premolar': 'https://sketchfab.com/3d-models/dental-tooth-anatomy-d6c1d500713d42c59ddd4f56c4b792f0/download',
+  'incisor': 'https://sketchfab.com/3d-models/dental-tooth-anatomy-d6c1d500713d42c59ddd4f56c4b792f0/download'
+};
 
 // Realistic tooth model with proper anatomy
-const RealisticToothModel: React.FC<ToothModelProps> = ({ 
+const RealisticToothModel = ({ 
   position, 
   isSelected, 
   onClick, 
   preparationQuality, 
   currentTool,
-  preparationProgress 
+  preparationProgress,
+  toothType = 'molar'
 }) => {
-  const meshRef = useRef<any>();
+  const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
+  const { scene } = useGLTF(TOOTH_MODELS[toothType]);
+  const toothModel = useRef();
+  
+  // Clone the model to avoid sharing materials between instances
+  useEffect(() => {
+    if (toothModel.current) return;
+    
+    // Clone the scene to avoid sharing materials
+    toothModel.current = scene.clone();
+    
+    // Apply materials to the tooth parts
+    toothModel.current.traverse((child) => {
+      if (child.isMesh) {
+        // Create new materials for each part
+        if (child.name.toLowerCase().includes('enamel')) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: getToothColor(),
+            roughness: 0.2,
+            metalness: 0.05,
+            transparent: true,
+            opacity: 0.9
+          });
+        } else if (child.name.toLowerCase().includes('dentin')) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: '#f0e68c',
+            roughness: 0.4,
+            metalness: 0.02
+          });
+        } else if (child.name.toLowerCase().includes('pulp')) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: '#ff6b6b',
+            roughness: 0.6,
+            metalness: 0.0,
+            emissive: '#8b0000',
+            emissiveIntensity: 0.2
+          });
+        } else if (child.name.toLowerCase().includes('root')) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: '#e6d875',
+            roughness: 0.5,
+            metalness: 0.0
+          });
+        } else {
+          child.material = new THREE.MeshStandardMaterial({
+            color: getToothColor(),
+            roughness: 0.3
+          });
+        }
+      }
+    });
+  }, [scene, preparationQuality]);
   
   useFrame((state) => {
     if (meshRef.current) {
@@ -62,163 +112,37 @@ const RealisticToothModel: React.FC<ToothModelProps> = ({
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={isSelected ? 1.2 : hovered ? 1.05 : 1}
+      ref={meshRef}
     >
-      {/* Main Crown - More anatomical shape */}
-      <group ref={meshRef}>
-        {/* Central crown body with natural taper */}
-        <Cylinder
-          args={[0.9, 1.1, 1.8, 12]}
-          position={[0, 0.9, 0]}
-        >
-          <meshStandardMaterial 
-            color={getToothColor()} 
-            roughness={0.2}
-            metalness={0.05}
-          />
-        </Cylinder>
-        
-        {/* Occlusal surface with cusps */}
-        <group position={[0, 1.8, 0]}>
-          {/* Main occlusal surface */}
-          <Cylinder
-            args={[0.8, 0.8, 0.15, 12]}
-            position={[0, 0, 0]}
-          >
+      {/* Realistic tooth model */}
+      {toothModel.current && (
+        <primitive 
+          object={toothModel.current} 
+          scale={[0.5, 0.5, 0.5]} 
+          rotation={[0, Math.PI, 0]}
+        />
+      )}
+
+      {/* Preparation margin line - visible during preparation */}
+      {preparationProgress.occlusalReduction && (
+        <group position={[0, 0.3, 0]}>
+          <mesh>
+            <torusGeometry args={[0.95, 0.03, 16, 32]} />
             <meshStandardMaterial 
-              color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#faf8f5'}
-              roughness={0.3}
+              color={getMarginColor()}
+              roughness={0.1}
+              metalness={0.4}
+              emissive={getMarginColor()}
+              emissiveIntensity={0.3}
             />
-          </Cylinder>
-          
-          {/* Mesial cusp */}
-          <Sphere
-            args={[0.25, 8, 6]}
-            position={[0.3, 0.1, 0.2]}
-          >
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </Sphere>
-          
-          {/* Distal cusp */}
-          <Sphere
-            args={[0.22, 8, 6]}
-            position={[-0.3, 0.08, 0.15]}
-          >
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </Sphere>
-          
-          {/* Buccal cusp */}
-          <Sphere
-            args={[0.2, 8, 6]}
-            position={[0.1, 0.05, 0.4]}
-          >
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </Sphere>
-          
-          {/* Lingual cusp */}
-          <Sphere
-            args={[0.18, 8, 6]}
-            position={[-0.1, 0.03, -0.35]}
-          >
-            <meshStandardMaterial 
-              color={getToothColor()}
-              roughness={0.25}
-            />
-          </Sphere>
+          </mesh>
         </group>
-
-        {/* Cervical line / CEJ */}
-        <Cylinder
-          args={[1.05, 1.05, 0.08, 16]}
-          position={[0, 0.1, 0]}
-        >
-          <meshStandardMaterial 
-            color="#d4af37"
-            roughness={0.1}
-            metalness={0.2}
-            transparent
-            opacity={0.6}
-          />
-        </Cylinder>
-
-        {/* Root structure - More anatomical */}
-        <group position={[0, -0.8, 0]}>
-          {/* Main root */}
-          <Cylinder
-            args={[0.7, 0.4, 1.6, 12]}
-            position={[0, 0, 0]}
-          >
-            <meshStandardMaterial 
-              color="#f0e68c" 
-              roughness={0.4}
-              metalness={0.02}
-            />
-          </Cylinder>
-          
-          {/* Root apex */}
-          <Sphere
-            args={[0.35, 8, 6]}
-            position={[0, -0.8, 0]}
-          >
-            <meshStandardMaterial 
-              color="#e6d875"
-              roughness={0.5}
-            />
-          </Sphere>
-        </group>
-
-        {/* Preparation margin line */}
-        <Cylinder
-          args={[0.95, 0.95, 0.06, 16]}
-          position={[0, 0.3, 0]}
-        >
-          <meshStandardMaterial 
-            color={getMarginColor()}
-            roughness={0.1}
-            metalness={0.4}
-          />
-        </Cylinder>
-
-        {/* Anatomical grooves */}
-        <Box
-          args={[0.05, 1.5, 1.8]}
-          position={[0.4, 0.9, 0]}
-          rotation={[0, 0, 0.2]}
-        >
-          <meshStandardMaterial 
-            color="#e8dcc0"
-            transparent
-            opacity={0.7}
-          />
-        </Box>
-        
-        <Box
-          args={[0.05, 1.5, 1.8]}
-          position={[-0.4, 0.9, 0]}
-          rotation={[0, 0, -0.2]}
-        >
-          <meshStandardMaterial 
-            color="#e8dcc0"
-            transparent
-            opacity={0.7}
-          />
-        </Box>
-      </group>
+      )}
 
       {/* Selection indicator */}
       {isSelected && (
-        <Cylinder
-          args={[1.4, 1.4, 0.03, 16]}
-          position={[0, -1.5, 0]}
-        >
+        <mesh position={[0, -1.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.2, 1.4, 32]} />
           <meshStandardMaterial 
             color="#2196f3"
             transparent
@@ -226,72 +150,84 @@ const RealisticToothModel: React.FC<ToothModelProps> = ({
             emissive="#1976d2"
             emissiveIntensity={0.3}
           />
-        </Cylinder>
+        </mesh>
       )}
 
       {/* Tool interaction effects */}
       {isSelected && currentTool === 'handpiece' && (
         <>
           {/* Water spray particles */}
-          <Sphere args={[0.03]} position={[0.4, 1.2, 0.3]}>
-            <meshStandardMaterial color="#87ceeb" transparent opacity={0.8} />
-          </Sphere>
-          <Sphere args={[0.025]} position={[-0.3, 1.1, 0.4]}>
-            <meshStandardMaterial color="#87ceeb" transparent opacity={0.6} />
-          </Sphere>
-          <Sphere args={[0.02]} position={[0.2, 1.0, -0.3]}>
-            <meshStandardMaterial color="#87ceeb" transparent opacity={0.7} />
-          </Sphere>
+          <group>
+            {[...Array(10)].map((_, i) => (
+              <mesh key={i} position={[
+                (Math.random() - 0.5) * 0.8,
+                1 + Math.random() * 0.5,
+                (Math.random() - 0.5) * 0.8
+              ]}>
+                <sphereGeometry args={[0.02 + Math.random() * 0.01]} />
+                <meshStandardMaterial color="#87ceeb" transparent opacity={0.6 + Math.random() * 0.3} />
+              </mesh>
+            ))}
+          </group>
           
           {/* Cutting debris */}
-          <Sphere args={[0.015]} position={[0.5, 0.8, 0.2]}>
-            <meshStandardMaterial color="#deb887" />
-          </Sphere>
-          <Sphere args={[0.02]} position={[-0.4, 0.9, 0.3]}>
-            <meshStandardMaterial color="#deb887" />
-          </Sphere>
+          <group>
+            {[...Array(5)].map((_, i) => (
+              <mesh key={i} position={[
+                (Math.random() - 0.5) * 1,
+                0.8 + Math.random() * 0.3,
+                (Math.random() - 0.5) * 1
+              ]}>
+                <sphereGeometry args={[0.015 + Math.random() * 0.01]} />
+                <meshStandardMaterial color="#deb887" />
+              </mesh>
+            ))}
+          </group>
         </>
       )}
 
       {/* Probe measurement indicators */}
       {isSelected && currentTool === 'probe' && (
         <>
-          <Box args={[0.02, 0.5, 0.02]} position={[0.6, 1.0, 0]}>
-            <meshStandardMaterial color="#ff6b6b" />
-          </Box>
-          <Text
-            position={[0.8, 1.2, 0]}
-            fontSize={0.15}
-            color="#ff6b6b"
-            anchorX="center"
-          >
-            2.5mm
-          </Text>
+          <group position={[0.6, 1.0, 0]}>
+            <mesh>
+              <boxGeometry args={[0.02, 0.5, 0.02]} />
+              <meshStandardMaterial color="#ff6b6b" />
+            </mesh>
+            <Text
+              position={[0.2, 0.2, 0]}
+              fontSize={0.15}
+              color="#ff6b6b"
+              anchorX="center"
+            >
+              2.5mm
+            </Text>
+          </group>
         </>
       )}
     </group>
   );
 };
 
-const DentalOfficeScene: React.FC = () => {
+const DentalOfficeScene = () => {
   const { state, dispatch } = useGame();
-  const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
-  const [currentTool, setCurrentTool] = useState<'handpiece' | 'probe' | 'mirror'>('handpiece');
+  const [selectedTooth, setSelectedTooth] = useState(null);
+  const [currentTool, setCurrentTool] = useState('handpiece');
   const [preparationSteps, setPreparationSteps] = useState({
     occlusalReduction: false,
     axialReduction: false,
     marginPreparation: false,
     finishingPolishing: false
   });
-  const [feedback, setFeedback] = useState<string>('');
+  const [feedback, setFeedback] = useState('');
   const [score, setScore] = useState(0);
   const [isWorking, setIsWorking] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const teeth = [
-    { id: 1, position: [-3, 0, 0] as [number, number, number], quality: 'poor' as const },
-    { id: 2, position: [0, 0, 0] as [number, number, number], quality: 'good' as const },
-    { id: 3, position: [3, 0, 0] as [number, number, number], quality: 'excellent' as const },
+    { id: 1, position: [-3, 0, 0], quality: 'poor', type: 'molar' },
+    { id: 2, position: [0, 0, 0], quality: 'good', type: 'premolar' },
+    { id: 3, position: [3, 0, 0], quality: 'excellent', type: 'incisor' },
   ];
 
   const tools = [
@@ -318,7 +254,7 @@ const DentalOfficeScene: React.FC = () => {
     }
   ];
 
-  const handleToothClick = (toothId: number) => {
+  const handleToothClick = (toothId) => {
     setSelectedTooth(toothId);
     const tooth = teeth.find(t => t.id === toothId);
     if (tooth) {
@@ -326,7 +262,7 @@ const DentalOfficeScene: React.FC = () => {
     }
   };
 
-  const provideFeedback = async (quality: 'poor' | 'good' | 'excellent') => {
+  const provideFeedback = async (quality) => {
     let feedbackMessage = '';
     let xpGain = 0;
 
@@ -350,7 +286,7 @@ const DentalOfficeScene: React.FC = () => {
     dispatch({ type: 'EARN_XP', payload: Math.max(0, xpGain) });
   };
 
-  const handleStepComplete = (step: keyof typeof preparationSteps) => {
+  const handleStepComplete = (step) => {
     if (selectedTooth === null) {
       setFeedback("Please select a tooth first before performing any procedures.");
       return;
@@ -488,25 +424,32 @@ const DentalOfficeScene: React.FC = () => {
                 preparationQuality={tooth.quality}
                 currentTool={currentTool}
                 preparationProgress={preparationSteps}
+                toothType={tooth.type}
               />
             ))}
             
             {/* Dental chair/base with better materials */}
-            <Box args={[10, 0.3, 4]} position={[0, -2.5, 0]} receiveShadow>
+            <mesh position={[0, -2.5, 0]} receiveShadow>
+              <boxGeometry args={[10, 0.3, 4]} />
               <meshStandardMaterial 
                 color="#2c3e50" 
                 roughness={0.3}
                 metalness={0.1}
               />
-            </Box>
+            </mesh>
             
             {/* Background elements */}
-            <Box args={[0.5, 8, 0.5]} position={[6, 2, -2]}>
+            <mesh position={[6, 2, -2]}>
+              <boxGeometry args={[0.5, 8, 0.5]} />
               <meshStandardMaterial color="#34495e" />
-            </Box>
-            <Box args={[0.5, 8, 0.5]} position={[-6, 2, -2]}>
+            </mesh>
+            <mesh position={[-6, 2, -2]}>
+              <boxGeometry args={[0.5, 8, 0.5]} />
               <meshStandardMaterial color="#34495e" />
-            </Box>
+            </mesh>
+            
+            {/* Environment lighting for realistic reflections */}
+            <Environment preset="studio" />
             
             {/* Controls */}
             <OrbitControls 
@@ -566,7 +509,7 @@ const DentalOfficeScene: React.FC = () => {
                 return (
                   <button
                     key={tool.id}
-                    onClick={() => setCurrentTool(tool.id as any)}
+                    onClick={() => setCurrentTool(tool.id)}
                     className={`w-full p-3 rounded-lg border-2 transition-all duration-200 ${
                       currentTool === tool.id
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
@@ -624,7 +567,7 @@ const DentalOfficeScene: React.FC = () => {
               {Object.entries(preparationSteps).map(([step, completed]) => (
                 <button
                   key={step}
-                  onClick={() => !completed && handleStepComplete(step as keyof typeof preparationSteps)}
+                  onClick={() => !completed && handleStepComplete(step)}
                   disabled={completed || isWorking || selectedTooth === null}
                   className={`w-full p-3 rounded-lg border-2 transition-all duration-200 ${
                     completed
