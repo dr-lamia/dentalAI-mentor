@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Smartphone, Headset, Eye, Settings, Play, Pause, RotateCcw, Maximize } from 'lucide-react';
+import { Smartphone, Headphones, Eye, Settings, Play, Pause, RotateCcw, Maximize } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 
 const ARVRInterface: React.FC = () => {
@@ -91,7 +91,7 @@ const ARVRInterface: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                {selectedMode === 'AR' ? <Smartphone className="w-6 h-6" /> : <Headset className="w-6 h-6" />}
+                {selectedMode === 'AR' ? <Smartphone className="w-6 h-6" /> : <Headphones className="w-6 h-6" />}
               </div>
               <div>
                 <h2 className="text-xl font-bold">{selectedMode} Session Active</h2>
@@ -234,7 +234,7 @@ const ARVRInterface: React.FC = () => {
             >
               <div className="text-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Headset className="w-10 h-10 text-white" />
+                  <Headphones className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Virtual Reality</h3>
                 <p className="text-gray-600 mb-6">
