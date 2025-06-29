@@ -8,34 +8,34 @@ const Dashboard: React.FC = () => {
   const { user } = state;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-2xl p-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}! 👋</h1>
-            <p className="text-blue-100 text-lg">Ready to advance your dental expertise today?</p>
-            <div className="flex items-center mt-4 space-x-4">
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Welcome back, {user.name}! 👋</h1>
+            <p className="text-blue-100 text-sm sm:text-base lg:text-lg">Ready to advance your dental expertise today?</p>
+            <div className="flex flex-wrap items-center mt-3 sm:mt-4 gap-3 sm:gap-4">
               <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-300" />
-                <span className="font-semibold">Level {user.level}</span>
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" />
+                <span className="font-semibold text-sm sm:text-base">Level {user.level}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Award className="w-5 h-5 text-yellow-300" />
-                <span className="font-semibold">{user.badges.length} Badges</span>
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" />
+                <span className="font-semibold text-sm sm:text-base">{user.badges.length} Badges</span>
               </div>
             </div>
           </div>
-          <div className="hidden md:block">
-            <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <Trophy className="w-16 h-16 text-yellow-300" />
+          <div className="hidden md:block flex-shrink-0">
+            <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+              <Trophy className="w-12 h-12 lg:w-16 lg:h-16 text-yellow-300" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <StatsCard
           title="Total XP"
           value={user.xp}
@@ -67,11 +67,11 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Recent Activity & Progress */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className="space-y-3 sm:space-y-4">
             {[
               { action: 'Completed Endodontics Module', time: '2 hours ago', xp: 50 },
               { action: 'Earned "Precision Star" Badge', time: '1 day ago', xp: 25 },
@@ -79,12 +79,12 @@ const Dashboard: React.FC = () => {
               { action: 'Started Prosthodontics Course', time: '3 days ago', xp: 0 },
             ].map((activity, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">{activity.action}</p>
-                  <p className="text-sm text-gray-500">{activity.time}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{activity.action}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{activity.time}</p>
                 </div>
                 {activity.xp > 0 && (
-                  <div className="text-green-600 font-semibold">+{activity.xp} XP</div>
+                  <div className="text-green-600 font-semibold text-sm sm:text-base ml-2">+{activity.xp} XP</div>
                 )}
               </div>
             ))}
@@ -92,9 +92,9 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Study Progress */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
+          <div className="space-y-3 sm:space-y-4">
             {[
               { specialty: 'Endodontics', progress: 85, color: 'bg-blue-500' },
               { specialty: 'Periodontics', progress: 62, color: 'bg-green-500' },
@@ -119,9 +119,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {[
             { title: 'Take a Quiz', description: 'Test your knowledge', icon: Target, color: 'bg-blue-500' },
             { title: 'Join Study Group', description: 'Learn with peers', icon: Users, color: 'bg-green-500' },
@@ -131,14 +131,14 @@ const Dashboard: React.FC = () => {
             return (
               <button
                 key={index}
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all duration-200 text-left"
+                className="flex items-center p-3 sm:p-4 border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all duration-200 text-left w-full"
               >
-                <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center mr-4`}>
-                  <Icon className="w-5 h-5 text-white" />
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${action.color} flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0`}>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">{action.title}</h4>
-                  <p className="text-sm text-gray-500">{action.description}</p>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-gray-900 text-sm sm:text-base">{action.title}</h4>
+                  <p className="text-xs sm:text-sm text-gray-500">{action.description}</p>
                 </div>
               </button>
             );

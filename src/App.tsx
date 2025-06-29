@@ -23,13 +23,13 @@ const AppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">DM</span>
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span className="text-white font-bold text-lg sm:text-xl">DM</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading DentalMentor...</h2>
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Loading DentalMentor...</h2>
+          <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -70,10 +70,10 @@ const AppContent: React.FC = () => {
         return <ARVRInterface />;
       case 'profile':
         return (
-          <div className="p-6 text-center">
-            <div className="text-6xl mb-4">👤</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">User Profile</h2>
-            <p className="text-gray-600">Manage your account settings, view achievements, and track your learning journey.</p>
+          <div className="p-4 sm:p-6 text-center">
+            <div className="text-4xl sm:text-6xl mb-4">👤</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">User Profile</h2>
+            <p className="text-gray-600 text-sm sm:text-base">Manage your account settings, view achievements, and track your learning journey.</p>
           </div>
         );
       default:
@@ -98,12 +98,12 @@ const AppContent: React.FC = () => {
           )}
           
           {/* Main Content */}
-          <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''}`}>
+          <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''} ${!activeScene ? 'lg:ml-0' : ''}`}>
             {/* Scene Exit Button */}
             {activeScene && (
               <button
                 onClick={() => setActiveScene(null)}
-                className="fixed top-4 left-4 z-50 px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium"
+                className="fixed top-4 left-4 z-50 px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium text-sm sm:text-base"
               >
                 ← Exit Scene
               </button>

@@ -213,21 +213,21 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Learning Modules</h1>
-          <p className="text-gray-600">Choose from our comprehensive dental education courses and interactive simulations</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Learning Modules</h1>
+          <p className="text-gray-600 text-sm sm:text-base">Choose from our comprehensive dental education courses and interactive simulations</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
           <span>{filteredModules.length} modules available</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -236,7 +236,7 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
               placeholder="Search modules..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
 
@@ -246,7 +246,7 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
             <select
               value={selectedSpecialty}
               onChange={(e) => setSelectedSpecialty(e.target.value as DentalSpecialty | 'all')}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm"
             >
               <option value="all">All Specialties</option>
               {specialties.map(specialty => (
@@ -263,7 +263,7 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value as 'all' | 'beginner' | 'intermediate' | 'advanced')}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm"
             >
               <option value="all">All Levels</option>
               <option value="beginner">Beginner</option>
@@ -279,7 +279,7 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
               setSelectedSpecialty('all');
               setSelectedDifficulty('all');
             }}
-            className="px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
           >
             Clear Filters
           </button>
@@ -290,12 +290,12 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
       {interactiveModules.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center space-x-3">
-            <h2 className="text-xl font-bold text-gray-900">🎮 Interactive Simulations</h2>
-            <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">🎮 Interactive Simulations</h2>
+            <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
               New!
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {interactiveModules.map(module => (
               <div key={module.id} className="relative">
                 <ModuleCard
@@ -314,8 +314,8 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
       {/* Traditional Modules Section */}
       {traditionalModules.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">📚 Learning Modules</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">📚 Learning Modules</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {traditionalModules.map(module => (
               <ModuleCard
                 key={module.id}
@@ -329,10 +329,10 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
 
       {/* Empty State */}
       {filteredModules.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No modules found</h3>
-          <p className="text-gray-500">Try adjusting your search criteria or filters</p>
+        <div className="text-center py-8 sm:py-12">
+          <div className="text-4xl sm:text-6xl mb-4">🔍</div>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No modules found</h3>
+          <p className="text-gray-500 text-sm sm:text-base">Try adjusting your search criteria or filters</p>
         </div>
       )}
     </div>
