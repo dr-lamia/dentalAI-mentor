@@ -21,11 +21,31 @@ class DentalMentorService {
   // Use AI Integration Service for student questions
   async answerStudentQuestion(question: string): Promise<string> {
     try {
-      // Use the AI Integration Service which calls the FastAPI endpoint
+      // First try using the AI Integration Service which calls the FastAPI endpoint
       return await aiIntegrationService.askTutor(question, this.documentContext.join('\n\n'));
     } catch (error) {
       console.error('Error in DentalMentor service:', error);
-      return 'I apologize, but I encountered an error processing your question. Please try again!';
+      
+      // Fallback to direct Gemini API call if the service fails
+      try {
+        console.log('Falling back to direct Gemini API call');
+        const contextPrompt = this.documentContext.length > 0 
+          ? `Context from uploaded documents:\n${this.documentContext.join('\n\n')}\n\nStudent question: ${question}`
+          : `Student question: ${question}`;
+          
+        const fullPrompt = `You are Dr. DentalMentor, an expert in dental education. Please answer the following question in a clear, educational manner:
+        
+        ${contextPrompt}
+        
+        Provide a comprehensive but concise answer that would be helpful for a dental student.`;
+        
+        const result = await this.model.generateContent(fullPrompt);
+        const response = await result.response;
+        return response.text();
+      } catch (secondError) {
+        console.error('Fallback to Gemini API also failed:', secondError);
+        return 'I apologize, but I encountered an error processing your question. Please try again!';
+      }
     }
   }
 
