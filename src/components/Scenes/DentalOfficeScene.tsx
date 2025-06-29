@@ -1,0 +1,640 @@
+import React, { useState, useRef, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Text, Sphere, Cylinder, Box } from '@react-three/drei';
+import { motion } from 'framer-motion';
+import { Wrench, CheckCircle, AlertTriangle, RotateCcw, Zap } from 'lucide-react';
+import { useGame } from '../../contexts/GameContext';
+import * as THREE from 'three';
+
+interface ToothModelProps {
+  position: [number, number, number];
+  isSelected: boolean;
+  onClick: () => void;
+  preparationQuality: 'poor' | 'good' | 'excellent';
+  currentTool: string;
+  preparationProgress: any;
+}
+
+// Realistic tooth model with proper anatomy
+const RealisticToothModel: React.FC<ToothModelProps> = ({ 
+  position, 
+  isSelected, 
+  onClick, 
+  preparationQuality, 
+  currentTool,
+  preparationProgress 
+}) => {
+  const meshRef = useRef<any>();
+  const [hovered, setHovered] = useState(false);
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = isSelected ? Math.sin(state.clock.elapsedTime * 2) * 0.1 : 0;
+    }
+  });
+
+  const getToothColor = () => {
+    if (isSelected && currentTool === 'handpiece') {
+      return '#e6f3ff'; // Light blue when being worked on
+    }
+    switch (preparationQuality) {
+      case 'poor': return '#ffebee';
+      case 'good': return '#fff8e1';
+      case 'excellent': return '#e8f5e8';
+      default: return '#faf8f5'; // Natural tooth color
+    }
+  };
+
+  const getMarginColor = () => {
+    switch (preparationQuality) {
+      case 'poor': return '#ef4444';
+      case 'good': return '#f59e0b';
+      case 'excellent': return '#10b981';
+      default: return '#8b7355';
+    }
+  };
+
+  return (
+    <group 
+      position={position} 
+      onClick={onClick}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+      scale={isSelected ? 1.2 : hovered ? 1.05 : 1}
+    >
+      {/* Main Crown - More anatomical shape */}
+      <group ref={meshRef}>
+        {/* Central crown body with natural taper */}
+        <Cylinder
+          args={[0.9, 1.1, 1.8, 12]}
+          position={[0, 0.9, 0]}
+        >
+          <meshStandardMaterial 
+            color={getToothColor()} 
+            roughness={0.2}
+            metalness={0.05}
+          />
+        </Cylinder>
+        
+        {/* Occlusal surface with cusps */}
+        <group position={[0, 1.8, 0]}>
+          {/* Main occlusal surface */}
+          <Cylinder
+            args={[0.8, 0.8, 0.15, 12]}
+            position={[0, 0, 0]}
+          >
+            <meshStandardMaterial 
+              color={preparationProgress.occlusalReduction ? '#e3f2fd' : '#faf8f5'}
+              roughness={0.3}
+            />
+          </Cylinder>
+          
+          {/* Mesial cusp */}
+          <Sphere
+            args={[0.25, 8, 6]}
+            position={[0.3, 0.1, 0.2]}
+          >
+            <meshStandardMaterial 
+              color={getToothColor()}
+              roughness={0.25}
+            />
+          </Sphere>
+          
+          {/* Distal cusp */}
+          <Sphere
+            args={[0.22, 8, 6]}
+            position={[-0.3, 0.08, 0.15]}
+          >
+            <meshStandardMaterial 
+              color={getToothColor()}
+              roughness={0.25}
+            />
+          </Sphere>
+          
+          {/* Buccal cusp */}
+          <Sphere
+            args={[0.2, 8, 6]}
+            position={[0.1, 0.05, 0.4]}
+          >
+            <meshStandardMaterial 
+              color={getToothColor()}
+              roughness={0.25}
+            />
+          </Sphere>
+          
+          {/* Lingual cusp */}
+          <Sphere
+            args={[0.18, 8, 6]}
+            position={[-0.1, 0.03, -0.35]}
+          >
+            <meshStandardMaterial 
+              color={getToothColor()}
+              roughness={0.25}
+            />
+          </Sphere>
+        </group>
+
+        {/* Cervical line / CEJ */}
+        <Cylinder
+          args={[1.05, 1.05, 0.08, 16]}
+          position={[0, 0.1, 0]}
+        >
+          <meshStandardMaterial 
+            color="#d4af37"
+            roughness={0.1}
+            metalness={0.2}
+            transparent
+            opacity={0.6}
+          />
+        </Cylinder>
+
+        {/* Root structure - More anatomical */}
+        <group position={[0, -0.8, 0]}>
+          {/* Main root */}
+          <Cylinder
+            args={[0.7, 0.4, 1.6, 12]}
+            position={[0, 0, 0]}
+          >
+            <meshStandardMaterial 
+              color="#f0e68c" 
+              roughness={0.4}
+              metalness={0.02}
+            />
+          </Cylinder>
+          
+          {/* Root apex */}
+          <Sphere
+            args={[0.35, 8, 6]}
+            position={[0, -0.8, 0]}
+          >
+            <meshStandardMaterial 
+              color="#e6d875"
+              roughness={0.5}
+            />
+          </Sphere>
+        </group>
+
+        {/* Preparation margin line */}
+        <Cylinder
+          args={[0.95, 0.95, 0.06, 16]}
+          position={[0, 0.3, 0]}
+        >
+          <meshStandardMaterial 
+            color={getMarginColor()}
+            roughness={0.1}
+            metalness={0.4}
+          />
+        </Cylinder>
+
+        {/* Anatomical grooves */}
+        <Box
+          args={[0.05, 1.5, 1.8]}
+          position={[0.4, 0.9, 0]}
+          rotation={[0, 0, 0.2]}
+        >
+          <meshStandardMaterial 
+            color="#e8dcc0"
+            transparent
+            opacity={0.7}
+          />
+        </Box>
+        
+        <Box
+          args={[0.05, 1.5, 1.8]}
+          position={[-0.4, 0.9, 0]}
+          rotation={[0, 0, -0.2]}
+        >
+          <meshStandardMaterial 
+            color="#e8dcc0"
+            transparent
+            opacity={0.7}
+          />
+        </Box>
+      </group>
+
+      {/* Selection indicator */}
+      {isSelected && (
+        <Cylinder
+          args={[1.4, 1.4, 0.03, 16]}
+          position={[0, -1.5, 0]}
+        >
+          <meshStandardMaterial 
+            color="#2196f3"
+            transparent
+            opacity={0.8}
+            emissive="#1976d2"
+            emissiveIntensity={0.3}
+          />
+        </Cylinder>
+      )}
+
+      {/* Tool interaction effects */}
+      {isSelected && currentTool === 'handpiece' && (
+        <>
+          {/* Water spray particles */}
+          <Sphere args={[0.03]} position={[0.4, 1.2, 0.3]}>
+            <meshStandardMaterial color="#87ceeb" transparent opacity={0.8} />
+          </Sphere>
+          <Sphere args={[0.025]} position={[-0.3, 1.1, 0.4]}>
+            <meshStandardMaterial color="#87ceeb" transparent opacity={0.6} />
+          </Sphere>
+          <Sphere args={[0.02]} position={[0.2, 1.0, -0.3]}>
+            <meshStandardMaterial color="#87ceeb" transparent opacity={0.7} />
+          </Sphere>
+          
+          {/* Cutting debris */}
+          <Sphere args={[0.015]} position={[0.5, 0.8, 0.2]}>
+            <meshStandardMaterial color="#deb887" />
+          </Sphere>
+          <Sphere args={[0.02]} position={[-0.4, 0.9, 0.3]}>
+            <meshStandardMaterial color="#deb887" />
+          </Sphere>
+        </>
+      )}
+
+      {/* Probe measurement indicators */}
+      {isSelected && currentTool === 'probe' && (
+        <>
+          <Box args={[0.02, 0.5, 0.02]} position={[0.6, 1.0, 0]}>
+            <meshStandardMaterial color="#ff6b6b" />
+          </Box>
+          <Text
+            position={[0.8, 1.2, 0]}
+            fontSize={0.15}
+            color="#ff6b6b"
+            anchorX="center"
+          >
+            2.5mm
+          </Text>
+        </>
+      )}
+    </group>
+  );
+};
+
+const DentalOfficeScene: React.FC = () => {
+  const { state, dispatch } = useGame();
+  const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
+  const [currentTool, setCurrentTool] = useState<'handpiece' | 'probe' | 'mirror'>('handpiece');
+  const [preparationSteps, setPreparationSteps] = useState({
+    occlusalReduction: false,
+    axialReduction: false,
+    marginPreparation: false,
+    finishingPolishing: false
+  });
+  const [feedback, setFeedback] = useState<string>('');
+  const [score, setScore] = useState(0);
+  const [isWorking, setIsWorking] = useState(false);
+
+  const teeth = [
+    { id: 1, position: [-3, 0, 0] as [number, number, number], quality: 'poor' as const },
+    { id: 2, position: [0, 0, 0] as [number, number, number], quality: 'good' as const },
+    { id: 3, position: [3, 0, 0] as [number, number, number], quality: 'excellent' as const },
+  ];
+
+  const tools = [
+    { 
+      id: 'handpiece', 
+      name: 'High-Speed Handpiece', 
+      icon: Wrench, 
+      description: 'Primary cutting tool for tooth preparation',
+      color: 'bg-blue-500'
+    },
+    { 
+      id: 'probe', 
+      name: 'Periodontal Probe', 
+      icon: CheckCircle, 
+      description: 'Measurement and assessment tool',
+      color: 'bg-green-500'
+    },
+    { 
+      id: 'mirror', 
+      name: 'Dental Mirror', 
+      icon: RotateCcw, 
+      description: 'Visualization and retraction tool',
+      color: 'bg-purple-500'
+    }
+  ];
+
+  const handleToothClick = (toothId: number) => {
+    setSelectedTooth(toothId);
+    const tooth = teeth.find(t => t.id === toothId);
+    if (tooth) {
+      provideFeedback(tooth.quality);
+    }
+  };
+
+  const provideFeedback = (quality: 'poor' | 'good' | 'excellent') => {
+    let feedbackMessage = '';
+    let xpGain = 0;
+
+    switch (quality) {
+      case 'poor':
+        feedbackMessage = "❌ This preparation shows several issues: inadequate occlusal reduction, rough margins, and potential undercuts. Remember to maintain 1.5-2mm occlusal clearance and create smooth, continuous margins.";
+        xpGain = -5;
+        break;
+      case 'good':
+        feedbackMessage = "⚠️ Good progress! The basic form is correct, but we can improve the margin definition and surface smoothness. Consider using finer burs for finishing.";
+        xpGain = 5;
+        break;
+      case 'excellent':
+        feedbackMessage = "✅ Excellent preparation! Perfect taper (6-8 degrees), adequate reduction, smooth margins, and proper finish line. This meets all clinical standards!";
+        xpGain = 10;
+        break;
+    }
+
+    setFeedback(feedbackMessage);
+    setScore(prev => prev + xpGain);
+    dispatch({ type: 'EARN_XP', payload: Math.max(0, xpGain) });
+  };
+
+  const handleStepComplete = (step: keyof typeof preparationSteps) => {
+    if (selectedTooth === null) {
+      setFeedback("Please select a tooth first before performing any procedures.");
+      return;
+    }
+
+    setIsWorking(true);
+    
+    setTimeout(() => {
+      setPreparationSteps(prev => ({ ...prev, [step]: true }));
+      
+      const stepFeedback = {
+        occlusalReduction: "Great! You've achieved adequate occlusal reduction. Remember to check clearance in all excursive movements.",
+        axialReduction: "Excellent axial reduction! The taper looks good - aim for 6-8 degrees total convergence.",
+        marginPreparation: "Perfect margin preparation! The chamfer finish line is well-defined and smooth.",
+        finishingPolishing: "Outstanding finishing! The surface is smooth and ready for impression taking."
+      };
+
+      setFeedback(stepFeedback[step]);
+      dispatch({ type: 'EARN_XP', payload: 15 });
+      setScore(prev => prev + 15);
+      setIsWorking(false);
+    }, 2000);
+  };
+
+  const useTool = () => {
+    if (selectedTooth === null) {
+      setFeedback("Please select a tooth first before using any tools.");
+      return;
+    }
+
+    setIsWorking(true);
+    
+    setTimeout(() => {
+      const toolFeedback = {
+        handpiece: "Good technique with the handpiece! Maintain steady pressure and use water cooling.",
+        probe: "Probing depth measured. Check for adequate reduction and smooth margins.",
+        mirror: "Good visualization. The mirror helps you see all preparation angles clearly."
+      };
+
+      setFeedback(toolFeedback[currentTool]);
+      dispatch({ type: 'EARN_XP', payload: 5 });
+      setScore(prev => prev + 5);
+      setIsWorking(false);
+    }, 1000);
+  };
+
+  const resetPreparation = () => {
+    setPreparationSteps({
+      occlusalReduction: false,
+      axialReduction: false,
+      marginPreparation: false,
+      finishingPolishing: false
+    });
+    setSelectedTooth(null);
+    setFeedback('');
+    setScore(0);
+  };
+
+  return (
+    <div className="h-full flex">
+      {/* 3D Scene */}
+      <div className="flex-1 bg-gradient-to-b from-blue-50 to-white relative">
+        <Canvas 
+          camera={{ position: [0, 6, 12], fov: 50 }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Suspense fallback={null}>
+            {/* Enhanced Lighting for realistic appearance */}
+            <ambientLight intensity={0.4} />
+            <directionalLight position={[10, 10, 5]} intensity={1.2} castShadow />
+            <pointLight position={[5, 8, 5]} intensity={0.8} />
+            <pointLight position={[-5, 8, 5]} intensity={0.6} />
+            <spotLight 
+              position={[0, 10, 0]} 
+              angle={0.3} 
+              penumbra={0.1} 
+              intensity={1.5}
+              castShadow
+            />
+            
+            {/* Scene Title */}
+            <Text
+              position={[0, 5, 0]}
+              fontSize={0.8}
+              color="#1e40af"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Crown Preparation Simulation
+            </Text>
+            
+            {/* Realistic Teeth Models */}
+            {teeth.map((tooth) => (
+              <RealisticToothModel
+                key={tooth.id}
+                position={tooth.position}
+                isSelected={selectedTooth === tooth.id}
+                onClick={() => handleToothClick(tooth.id)}
+                preparationQuality={tooth.quality}
+                currentTool={currentTool}
+                preparationProgress={preparationSteps}
+              />
+            ))}
+            
+            {/* Dental chair/base with better materials */}
+            <Box args={[10, 0.3, 4]} position={[0, -2.5, 0]} receiveShadow>
+              <meshStandardMaterial 
+                color="#2c3e50" 
+                roughness={0.3}
+                metalness={0.1}
+              />
+            </Box>
+            
+            {/* Background elements */}
+            <Box args={[0.5, 8, 0.5]} position={[6, 2, -2]}>
+              <meshStandardMaterial color="#34495e" />
+            </Box>
+            <Box args={[0.5, 8, 0.5]} position={[-6, 2, -2]}>
+              <meshStandardMaterial color="#34495e" />
+            </Box>
+            
+            {/* Controls */}
+            <OrbitControls 
+              enablePan={true} 
+              enableZoom={true} 
+              enableRotate={true}
+              maxDistance={25}
+              minDistance={8}
+              target={[0, 0, 0]}
+              maxPolarAngle={Math.PI * 0.75}
+              minPolarAngle={Math.PI * 0.1}
+            />
+          </Suspense>
+        </Canvas>
+
+        {/* Working indicator */}
+        {isWorking && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 z-10">
+            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+            <span>Working...</span>
+          </div>
+        )}
+
+        {/* Instructions overlay */}
+        <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-4 max-w-md z-10 shadow-lg">
+          <h4 className="font-semibold text-gray-900 mb-2">🦷 Simulation Guide</h4>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li>• <strong>Click</strong> on a tooth to select it</li>
+            <li>• <strong>Choose</strong> a tool from the right panel</li>
+            <li>• <strong>Use</strong> the tool button to interact</li>
+            <li>• <strong>Complete</strong> preparation steps in sequence</li>
+            <li>• <strong>Mouse:</strong> drag to rotate, scroll to zoom</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Control Panel */}
+      <div className="w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto">
+        <div className="space-y-6">
+          {/* Score Display */}
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-4 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">Current Score</h3>
+                <p className="text-2xl font-bold">{score} XP</p>
+              </div>
+              <Zap className="w-8 h-8 text-yellow-300" />
+            </div>
+          </div>
+
+          {/* Tool Selection */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Select Tool</h3>
+            <div className="space-y-2">
+              {tools.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <button
+                    key={tool.id}
+                    onClick={() => setCurrentTool(tool.id as any)}
+                    className={`w-full p-3 rounded-lg border-2 transition-all duration-200 ${
+                      currentTool === tool.id
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-lg ${tool.color} flex items-center justify-center`}>
+                        <Icon className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium">{tool.name}</p>
+                        <p className="text-sm text-gray-500">{tool.description}</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={useTool}
+              disabled={isWorking || selectedTooth === null}
+              className="w-full mt-3 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isWorking ? 'Working...' : `Use ${tools.find(t => t.id === currentTool)?.name}`}
+            </button>
+          </div>
+
+          {/* Preparation Steps */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Preparation Steps</h3>
+            <div className="space-y-2">
+              {Object.entries(preparationSteps).map(([step, completed]) => (
+                <button
+                  key={step}
+                  onClick={() => !completed && handleStepComplete(step as keyof typeof preparationSteps)}
+                  disabled={completed || isWorking || selectedTooth === null}
+                  className={`w-full p-3 rounded-lg border-2 transition-all duration-200 ${
+                    completed
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : selectedTooth === null
+                      ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium capitalize">
+                      {step.replace(/([A-Z])/g, ' $1').trim()}
+                    </span>
+                    {completed && <CheckCircle className="w-5 h-5" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Feedback Panel */}
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gray-50 rounded-xl p-4"
+            >
+              <h4 className="font-semibold text-gray-900 mb-2">Instructor Feedback</h4>
+              <p className="text-sm text-gray-700 leading-relaxed">{feedback}</p>
+            </motion.div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <button
+              onClick={resetPreparation}
+              className="w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Reset Preparation
+            </button>
+            <button
+              onClick={() => {
+                dispatch({ type: 'EARN_XP', payload: 50 });
+                setFeedback("🎉 Simulation completed! You've mastered the fundamentals of crown preparation. Keep practicing to perfect your technique!");
+              }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium"
+            >
+              Complete Simulation
+            </button>
+          </div>
+
+          {/* Tips */}
+          <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+            <h4 className="font-semibold text-yellow-800 mb-2 flex items-center">
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              Pro Tips
+            </h4>
+            <ul className="text-sm text-yellow-700 space-y-1">
+              <li>• Click on a tooth to select it first</li>
+              <li>• Choose your tool before working</li>
+              <li>• Maintain 6-8° total convergence angle</li>
+              <li>• Ensure 1.5-2mm occlusal reduction</li>
+              <li>• Create smooth, continuous margins</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DentalOfficeScene;
