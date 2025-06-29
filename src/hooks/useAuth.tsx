@@ -1,6 +1,4 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { authAPI } from '../services/api';
-import socketService from '../services/socketService';
 
 interface User {
   id: string;
@@ -31,35 +29,43 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('authToken'));
+  const [token, setToken] = useState<string | null>('demo-token');
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = !!user && !!token;
 
   useEffect(() => {
+    // Auto-authenticate with demo user
     const initAuth = async () => {
-      const savedToken = localStorage.getItem('authToken');
-      const savedUser = localStorage.getItem('user');
+      // Simulate a brief loading period
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Set demo student user
+      const demoUser: User = {
+        id: 'demo-student-1',
+        name: 'Demo Student',
+        email: 'student@demo.com',
+        role: 'student',
+        level: 3,
+        xp: 1250,
+        totalPoints: 1450,
+        badges: [
+          {
+            id: '1',
+            name: 'First Steps',
+            description: 'Completed first quiz',
+            icon: '🎯',
+            rarity: 'common',
+            color: 'text-blue-500'
+          }
+        ],
+        currentStreak: 7,
+        studyTime: 24,
+        globalRank: 47
+      };
 
-      if (savedToken && savedUser) {
-        try {
-          setToken(savedToken);
-          setUser(JSON.parse(savedUser));
-          
-          // Verify token is still valid
-          const response = await authAPI.getMe();
-          setUser(response.data.user);
-          
-          // Connect to socket
-          socketService.connect(savedToken);
-        } catch (error) {
-          console.error('Token validation failed:', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
-          setToken(null);
-          setUser(null);
-        }
-      }
+      setUser(demoUser);
+      setToken('demo-token');
       setIsLoading(false);
     };
 
@@ -67,59 +73,54 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authAPI.login({ email, password });
-      const { token: newToken, user: newUser } = response.data;
+    // Mock login - automatically succeed
+    const demoUser: User = {
+      id: 'demo-student-1',
+      name: 'Demo Student',
+      email: email,
+      role: email.includes('teacher') ? 'teacher' : 'student',
+      level: 3,
+      xp: 1250,
+      totalPoints: 1450,
+      badges: [],
+      currentStreak: 7,
+      studyTime: 24,
+      globalRank: 47
+    };
 
-      setToken(newToken);
-      setUser(newUser);
-      
-      localStorage.setItem('authToken', newToken);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      // Connect to socket
-      socketService.connect(newToken);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Login failed');
-    }
+    setUser(demoUser);
+    setToken('demo-token');
   };
 
   const register = async (userData: { name: string; email: string; password: string; role: string }) => {
-    try {
-      const response = await authAPI.register(userData);
-      const { token: newToken, user: newUser } = response.data;
+    // Mock registration - automatically succeed
+    const newUser: User = {
+      id: 'demo-user-' + Date.now(),
+      name: userData.name,
+      email: userData.email,
+      role: userData.role as 'student' | 'teacher',
+      level: 1,
+      xp: 0,
+      totalPoints: 0,
+      badges: [],
+      currentStreak: 0,
+      studyTime: 0,
+      globalRank: 999
+    };
 
-      setToken(newToken);
-      setUser(newUser);
-      
-      localStorage.setItem('authToken', newToken);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      
-      // Connect to socket
-      socketService.connect(newToken);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Registration failed');
-    }
+    setUser(newUser);
+    setToken('demo-token');
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    
-    // Disconnect socket
-    socketService.disconnect();
-    
-    // Call logout endpoint
-    authAPI.logout().catch(console.error);
   };
 
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 
