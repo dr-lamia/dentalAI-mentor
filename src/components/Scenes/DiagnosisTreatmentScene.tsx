@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, FileImage, CheckCircle, XCircle, Clock, Award, Zap, AlertCircle, User, Calendar, Stethoscope } from 'lucide-react';
+import { Camera, FileImage, CheckCircle, XCircle, Clock, Award, Zap, AlertCircle, User, Calendar, Stethoscope, Brain } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { Question, CaseStudy } from '../../types';
 import { aiIntegrationService } from '../../services/aiIntegrationService';
