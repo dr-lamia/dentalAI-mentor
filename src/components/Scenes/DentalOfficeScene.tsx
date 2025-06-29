@@ -4,6 +4,7 @@ import { OrbitControls, Text, Sphere, Cylinder, Box } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import { Wrench, CheckCircle, AlertTriangle, RotateCcw, Zap } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
+import { aiIntegrationService } from '../../services/aiIntegrationService';
 import * as THREE from 'three';
 
 interface ToothModelProps {
@@ -285,6 +286,7 @@ const DentalOfficeScene: React.FC = () => {
   const [feedback, setFeedback] = useState<string>('');
   const [score, setScore] = useState(0);
   const [isWorking, setIsWorking] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const teeth = [
     { id: 1, position: [-3, 0, 0] as [number, number, number], quality: 'poor' as const },
@@ -324,7 +326,7 @@ const DentalOfficeScene: React.FC = () => {
     }
   };
 
-  const provideFeedback = (quality: 'poor' | 'good' | 'excellent') => {
+  const provideFeedback = async (quality: 'poor' | 'good' | 'excellent') => {
     let feedbackMessage = '';
     let xpGain = 0;
 
@@ -393,6 +395,42 @@ const DentalOfficeScene: React.FC = () => {
       setScore(prev => prev + 5);
       setIsWorking(false);
     }, 1000);
+  };
+
+  // AI-powered preparation analysis
+  const analyzePreparation = async () => {
+    if (selectedTooth === null) {
+      setFeedback("Please select a tooth first before analyzing.");
+      return;
+    }
+
+    setIsAnalyzing(true);
+
+    try {
+      // Get the selected tooth data
+      const tooth = teeth.find(t => t.id === selectedTooth);
+      
+      // Prepare the data for analysis
+      const meshData = null; // In a real app, this would be the 3D mesh data
+      const measurements = {
+        occlusalReduction: Math.random() * 2 + 1, // Simulate measurements
+        axialReduction: Math.random() * 1.5 + 0.5,
+        marginWidth: Math.random() * 0.8 + 0.2,
+        taper: Math.random() * 6 + 4
+      };
+      
+      // Call the AI service to analyze the preparation
+      const analysis = await aiIntegrationService.analyzePreparation(meshData, measurements);
+      
+      setFeedback(analysis);
+      dispatch({ type: 'EARN_XP', payload: 20 });
+      setScore(prev => prev + 20);
+    } catch (error) {
+      console.error('Error analyzing preparation:', error);
+      setFeedback("Error analyzing preparation. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const resetPreparation = () => {
@@ -485,10 +523,10 @@ const DentalOfficeScene: React.FC = () => {
         </Canvas>
 
         {/* Working indicator */}
-        {isWorking && (
+        {(isWorking || isAnalyzing) && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 z-10">
             <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-            <span>Working...</span>
+            <span>{isAnalyzing ? 'Analyzing...' : 'Working...'}</span>
           </div>
         )}
 
@@ -555,6 +593,27 @@ const DentalOfficeScene: React.FC = () => {
               className="w-full mt-3 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isWorking ? 'Working...' : `Use ${tools.find(t => t.id === currentTool)?.name}`}
+            </button>
+          </div>
+
+          {/* AI Analysis Button */}
+          <div>
+            <button
+              onClick={analyzePreparation}
+              disabled={isAnalyzing || selectedTooth === null}
+              className="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {isAnalyzing ? (
+                <>
+                  <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>Analyzing Preparation...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-5 h-5" />
+                  <span>Analyze Preparation</span>
+                </>
+              )}
             </button>
           </div>
 
