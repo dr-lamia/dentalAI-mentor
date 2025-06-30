@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MessageCircle, Users, Home, BookOpen, Trophy, User, Smartphone, Beaker, Stethoscope, Microscope, GraduationCap, Menu, X, Send } from 'lucide-react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { GameProvider } from './contexts/GameContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
 import Navigation from './components/Layout/Navigation';
@@ -16,6 +17,7 @@ import DiagnosisTreatmentScene from './components/Scenes/DiagnosisTreatmentScene
 import LaboratoryScene from './components/Scenes/LaboratoryScene';
 import AIAvatar from './components/AI/AIAvatar';
 import ChatInterface from './components/Multiplayer/ChatInterface';
+import HomePage from './components/Home/HomePage';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -37,10 +39,6 @@ const AppContent: React.FC = () => {
         </div>
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <AuthPage />;
   }
 
   const renderContent = () => {
@@ -168,60 +166,72 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <GameProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header - always visible unless in scene mode */}
-        {!activeScene && <Header />}
-        
-        <div className="flex">
-          {/* Navigation - hidden in scene mode */}
-          {!activeScene && (
-            <Navigation 
-              activeTab={activeTab} 
-              onTabChange={setActiveTab}
-              onSceneSelect={setActiveScene}
-            />
-          )}
-          
-          {/* Main Content */}
-          <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''} ${!activeScene ? 'lg:ml-0' : ''}`}>
-            {/* Scene Exit Button */}
-            {activeScene && (
-              <button
-                onClick={() => setActiveScene(null)}
-                className="fixed top-4 left-4 z-50 px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium text-sm sm:text-base"
-              >
-                ← Exit Scene
-              </button>
-            )}
-            
-            {renderContent()}
-          </main>
-        </div>
+    <Router>
+      <GameProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
+          <Route path="/dashboard/*" element={
+            isAuthenticated ? (
+              <div className="min-h-screen bg-gray-50">
+                {/* Header - always visible unless in scene mode */}
+                {!activeScene && <Header />}
+                
+                <div className="flex">
+                  {/* Navigation - hidden in scene mode */}
+                  {!activeScene && (
+                    <Navigation 
+                      activeTab={activeTab} 
+                      onTabChange={setActiveTab}
+                      onSceneSelect={setActiveScene}
+                    />
+                  )}
+                  
+                  {/* Main Content */}
+                  <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''} ${!activeScene ? 'lg:ml-0' : ''}`}>
+                    {/* Scene Exit Button */}
+                    {activeScene && (
+                      <button
+                        onClick={() => setActiveScene(null)}
+                        className="fixed top-4 left-4 z-50 px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium text-sm sm:text-base"
+                      >
+                        ← Exit Scene
+                      </button>
+                    )}
+                    
+                    {renderContent()}
+                  </main>
+                </div>
 
-        {/* AI Avatar - always available */}
-        <AIAvatar 
-          isVisible={showAIAvatar} 
-          onToggle={() => setShowAIAvatar(!showAIAvatar)} 
-        />
+                {/* AI Avatar - always available */}
+                <AIAvatar 
+                  isVisible={showAIAvatar} 
+                  onToggle={() => setShowAIAvatar(!showAIAvatar)} 
+                />
 
-        {/* Chat Modal */}
-        {showChat && activeChatGroup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="w-full max-w-4xl h-[80vh]">
-              <ChatInterface 
-                groupId={activeChatGroup.id} 
-                groupName={activeChatGroup.name} 
-                onClose={() => {
-                  setShowChat(false);
-                  setActiveChatGroup(null);
-                }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </GameProvider>
+                {/* Chat Modal */}
+                {showChat && activeChatGroup && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="w-full max-w-4xl h-[80vh]">
+                      <ChatInterface 
+                        groupId={activeChatGroup.id} 
+                        groupName={activeChatGroup.name} 
+                        onClose={() => {
+                          setShowChat(false);
+                          setActiveChatGroup(null);
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Navigate to="/auth" />
+            )
+          } />
+        </Routes>
+      </GameProvider>
+    </Router>
   );
 };
 
