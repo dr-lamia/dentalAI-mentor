@@ -67,8 +67,12 @@ const Header: React.FC = () => {
 
           {/* User Profile */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center overflow-hidden">
+              <img 
+                src="https://images.pexels.com/photos/3779709/pexels-photo-3779709.jpeg?auto=compress&cs=tinysrgb&w=100" 
+                alt={user.name}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="hidden sm:block text-right">
               <p className="text-sm font-medium text-gray-900">{user.name}</p>

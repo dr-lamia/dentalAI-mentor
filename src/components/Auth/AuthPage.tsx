@@ -28,25 +28,57 @@ const AuthPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🦷</div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">3D Simulations</h3>
-              <p className="text-gray-600 text-xs sm:text-sm">Practice crown preparation and dental procedures in realistic 3D environments</p>
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 -mt-8 -mr-8 bg-blue-100 rounded-full opacity-70"></div>
+              <div className="relative z-10">
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🦷</div>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">3D Simulations</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">Practice crown preparation and dental procedures in realistic 3D environments</p>
+              </div>
+              <img 
+                src="https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                alt="3D Simulation" 
+                className="absolute bottom-0 right-0 w-16 h-16 object-cover rounded-tl-xl opacity-60"
+              />
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🤖</div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">AI-Powered Learning</h3>
-              <p className="text-gray-600 text-xs sm:text-sm">Get personalized feedback and guidance from our advanced AI mentor</p>
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 -mt-8 -mr-8 bg-purple-100 rounded-full opacity-70"></div>
+              <div className="relative z-10">
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">🤖</div>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">AI-Powered Learning</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">Get personalized feedback and guidance from our advanced AI mentor</p>
+              </div>
+              <img 
+                src="https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                alt="AI Learning" 
+                className="absolute bottom-0 right-0 w-16 h-16 object-cover rounded-tl-xl opacity-60"
+              />
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">👥</div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Real-time Collaboration</h3>
-              <p className="text-gray-600 text-xs sm:text-sm">Join study groups and learn together with peers from around the world</p>
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 -mt-8 -mr-8 bg-green-100 rounded-full opacity-70"></div>
+              <div className="relative z-10">
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">👥</div>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Real-time Collaboration</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">Join study groups and learn together with peers from around the world</p>
+              </div>
+              <img 
+                src="https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                alt="Collaboration" 
+                className="absolute bottom-0 right-0 w-16 h-16 object-cover rounded-tl-xl opacity-60"
+              />
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
-              <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">📊</div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Progress Tracking</h3>
-              <p className="text-gray-600 text-xs sm:text-sm">Monitor your learning journey with detailed analytics and achievements</p>
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 -mt-8 -mr-8 bg-orange-100 rounded-full opacity-70"></div>
+              <div className="relative z-10">
+                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">📊</div>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Progress Tracking</h3>
+                <p className="text-gray-600 text-xs sm:text-sm">Monitor your learning journey with detailed analytics and achievements</p>
+              </div>
+              <img 
+                src="https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                alt="Progress Tracking" 
+                className="absolute bottom-0 right-0 w-16 h-16 object-cover rounded-tl-xl opacity-60"
+              />
             </div>
           </div>
         </motion.div>

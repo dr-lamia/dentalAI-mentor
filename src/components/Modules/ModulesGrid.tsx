@@ -437,6 +437,58 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ onSceneSelect }) => {
         </div>
       )}
 
+      {/* Featured Modules */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Featured Learning Paths</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              title: "Endodontic Mastery",
+              description: "Complete pathway to mastering root canal procedures",
+              modules: 8,
+              estimatedTime: "12 hours",
+              image: "https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600",
+              color: "from-blue-500 to-blue-700"
+            },
+            {
+              title: "Digital Dentistry",
+              description: "Modern techniques in CAD/CAM and digital workflows",
+              modules: 6,
+              estimatedTime: "8 hours",
+              image: "https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=600",
+              color: "from-purple-500 to-purple-700"
+            },
+            {
+              title: "Esthetic Dentistry",
+              description: "Creating beautiful, natural-looking restorations",
+              modules: 10,
+              estimatedTime: "15 hours",
+              image: "https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=600",
+              color: "from-green-500 to-green-700"
+            }
+          ].map((path, index) => (
+            <div key={index} className="relative rounded-xl overflow-hidden group">
+              <img 
+                src={path.image} 
+                alt={path.title} 
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 flex flex-col justify-end">
+                <h3 className="text-white font-bold text-lg mb-1">{path.title}</h3>
+                <p className="text-white/80 text-sm mb-3">{path.description}</p>
+                <div className="flex items-center justify-between text-xs text-white/70">
+                  <span>{path.modules} modules</span>
+                  <span>{path.estimatedTime}</span>
+                </div>
+                <button className="mt-3 py-2 px-4 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors text-sm font-medium">
+                  View Path
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Empty State */}
       {filteredModules.length === 0 && (
         <div className="text-center py-8 sm:py-12">

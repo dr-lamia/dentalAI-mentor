@@ -76,15 +76,22 @@ const Dashboard: React.FC = () => {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-3 sm:space-y-4">
             {[
-              { action: 'Completed Endodontics Module', time: '2 hours ago', xp: 50 },
-              { action: 'Earned "Precision Star" Badge', time: '1 day ago', xp: 25 },
-              { action: 'Finished Root Canal Quiz', time: '2 days ago', xp: 30 },
-              { action: 'Started Prosthodontics Course', time: '3 days ago', xp: 0 },
+              { action: 'Completed Endodontics Module', time: '2 hours ago', xp: 50, image: 'https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Earned "Precision Star" Badge', time: '1 day ago', xp: 25, image: 'https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Finished Root Canal Quiz', time: '2 days ago', xp: 30, image: 'https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Started Prosthodontics Course', time: '3 days ago', xp: 0, image: 'https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=100' },
             ].map((activity, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{activity.action}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{activity.time}</p>
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  {activity.image && (
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                      <img src={activity.image} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{activity.action}</p>
+                    <p className="text-xs sm:text-sm text-gray-500">{activity.time}</p>
+                  </div>
                 </div>
                 {activity.xp > 0 && (
                   <div className="text-green-600 font-semibold text-sm sm:text-base ml-2">+{activity.xp} XP</div>
@@ -99,21 +106,28 @@ const Dashboard: React.FC = () => {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
           <div className="space-y-3 sm:space-y-4">
             {[
-              { specialty: 'Endodontics', progress: 85, color: 'bg-blue-500' },
-              { specialty: 'Periodontics', progress: 62, color: 'bg-green-500' },
-              { specialty: 'Prosthodontics', progress: 45, color: 'bg-purple-500' },
-              { specialty: 'Orthodontics', progress: 30, color: 'bg-orange-500' },
+              { specialty: 'Endodontics', progress: 85, color: 'bg-blue-500', image: 'https://images.pexels.com/photos/3779709/pexels-photo-3779709.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Periodontics', progress: 62, color: 'bg-green-500', image: 'https://images.pexels.com/photos/3779693/pexels-photo-3779693.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Prosthodontics', progress: 45, color: 'bg-purple-500', image: 'https://images.pexels.com/photos/3779698/pexels-photo-3779698.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Orthodontics', progress: 30, color: 'bg-orange-500', image: 'https://images.pexels.com/photos/3779714/pexels-photo-3779714.jpeg?auto=compress&cs=tinysrgb&w=100' },
             ].map((item, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-gray-700">{item.specialty}</span>
-                  <span className="text-sm text-gray-500">{item.progress}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${item.color} transition-all duration-300`}
-                    style={{ width: `${item.progress}%` }}
-                  />
+              <div key={index} className="flex items-center space-x-3">
+                {item.image && (
+                  <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">{item.specialty}</span>
+                    <span className="text-sm text-gray-500">{item.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${item.color} transition-all duration-300`}
+                      style={{ width: `${item.progress}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             ))}
@@ -250,6 +264,103 @@ const Dashboard: React.FC = () => {
               </button>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Featured Learning Resources */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Featured Learning Resources</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              title: "Advanced Endodontics",
+              description: "Master complex root canal procedures",
+              image: "https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600",
+              category: "Course"
+            },
+            {
+              title: "Dental Implant Techniques",
+              description: "Latest approaches in implantology",
+              image: "https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=600",
+              category: "Workshop"
+            },
+            {
+              title: "Esthetic Dentistry",
+              description: "Creating beautiful, natural smiles",
+              image: "https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=600",
+              category: "Webinar"
+            },
+            {
+              title: "Periodontal Surgery",
+              description: "Surgical techniques for gum disease",
+              image: "https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=600",
+              category: "Masterclass"
+            }
+          ].map((resource, index) => (
+            <div key={index} className="group relative overflow-hidden rounded-xl">
+              <img 
+                src={resource.image} 
+                alt={resource.title} 
+                className="w-full h-48 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex flex-col justify-end">
+                <span className="text-xs font-medium text-blue-300 mb-1">{resource.category}</span>
+                <h4 className="text-white font-semibold mb-1">{resource.title}</h4>
+                <p className="text-white/80 text-xs">{resource.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Upcoming Events */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            {
+              title: "Live Webinar: Digital Dentistry",
+              date: "June 15, 2025",
+              time: "2:00 PM - 4:00 PM",
+              image: "https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=600",
+              attendees: 42
+            },
+            {
+              title: "Case Study Discussion: Complex Restorations",
+              date: "June 18, 2025",
+              time: "6:30 PM - 8:00 PM",
+              image: "https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=600",
+              attendees: 28
+            },
+            {
+              title: "Hands-on Workshop: Dental Photography",
+              date: "June 22, 2025",
+              time: "9:00 AM - 12:00 PM",
+              image: "https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600",
+              attendees: 15
+            }
+          ].map((event, index) => (
+            <div key={index} className="flex flex-col h-full border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200">
+              <div className="h-32 overflow-hidden">
+                <img 
+                  src={event.image} 
+                  alt={event.title} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4 flex-1 flex flex-col">
+                <h4 className="font-medium text-gray-900 mb-2">{event.title}</h4>
+                <div className="text-sm text-gray-600 space-y-1 mb-3">
+                  <p>{event.date}</p>
+                  <p>{event.time}</p>
+                </div>
+                <div className="mt-auto flex items-center justify-between">
+                  <span className="text-xs text-gray-500">{event.attendees} attending</span>
+                  <button className="text-sm text-blue-600 font-medium hover:text-blue-700">Register</button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
