@@ -5,13 +5,10 @@ import { useGame } from '../../contexts/GameContext';
 import ChatInterface from '../Multiplayer/ChatInterface';
 
 const Dashboard: React.FC = () => {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { user } = state;
   const [showChat, setShowChat] = useState(false);
   const [activeChatGroup, setActiveChatGroup] = useState<{id: string, name: string} | null>(null);
-
-  const xpToNextLevel = ((user.level) * 100) - user.xp;
-  const progressPercentage = (user.xp % 100);
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
