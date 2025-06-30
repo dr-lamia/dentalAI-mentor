@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, BookOpen, Users, Trophy, User, Smartphone, Beaker, Stethoscope, Microscope, GraduationCap, Menu, X } from 'lucide-react';
+import { Home, BookOpen, Users, Trophy, User, Smartphone, Beaker, Stethoscope, Microscope, GraduationCap, Menu, X, MessageCircle } from 'lucide-react';
 
 interface NavigationProps {
   activeTab: string;
@@ -15,6 +15,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange, onScene
     { id: 'modules', label: 'Learning Modules', icon: BookOpen },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'community', label: 'Study Groups', icon: Users },
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'arvr', label: 'AR/VR Learning', icon: Smartphone },
     { id: 'profile', label: 'Profile', icon: User },
   ];

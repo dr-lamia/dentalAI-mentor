@@ -14,12 +14,15 @@ import LectureRoomScene from './components/Scenes/LectureRoomScene';
 import DiagnosisTreatmentScene from './components/Scenes/DiagnosisTreatmentScene';
 import LaboratoryScene from './components/Scenes/LaboratoryScene';
 import AIAvatar from './components/AI/AIAvatar';
+import ChatInterface from './components/Multiplayer/ChatInterface';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [activeScene, setActiveScene] = useState<string | null>(null);
   const [showAIAvatar, setShowAIAvatar] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [activeChatGroup, setActiveChatGroup] = useState<{id: string, name: string} | null>(null);
 
   if (isLoading) {
     return (
@@ -66,6 +69,88 @@ const AppContent: React.FC = () => {
         return <Leaderboard />;
       case 'community':
         return <StudyGroupPanel />;
+      case 'chat':
+        return (
+          <div className="p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Chat Center</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div 
+                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-all duration-200"
+                onClick={() => {
+                  setActiveChatGroup({
+                    id: 'general-chat',
+                    name: 'General Discussion'
+                  });
+                  setShowChat(true);
+                }}
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <MessageCircle className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">General Discussion</h3>
+                    <p className="text-sm text-gray-500">Open chat for all students</p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Join the conversation with fellow dental students from around the world.</p>
+                <button className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                  Join Chat
+                </button>
+              </div>
+              
+              <div 
+                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-all duration-200"
+                onClick={() => {
+                  setActiveChatGroup({
+                    id: 'endodontics-chat',
+                    name: 'Endodontics Study Group'
+                  });
+                  setShowChat(true);
+                }}
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Endodontics Study Group</h3>
+                    <p className="text-sm text-gray-500">12 members active</p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Discuss root canal techniques, instruments, and challenging cases.</p>
+                <button className="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                  Join Group
+                </button>
+              </div>
+              
+              <div 
+                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-all duration-200"
+                onClick={() => {
+                  setActiveChatGroup({
+                    id: 'prosthodontics-chat',
+                    name: 'Prosthodontics Masters'
+                  });
+                  setShowChat(true);
+                }}
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Prosthodontics Masters</h3>
+                    <p className="text-sm text-gray-500">8 members active</p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Share knowledge about crown preparations, materials, and digital workflows.</p>
+                <button className="w-full py-2 px-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                  Join Group
+                </button>
+              </div>
+            </div>
+          </div>
+        );
       case 'arvr':
         return <ARVRInterface />;
       case 'profile':
@@ -118,6 +203,22 @@ const AppContent: React.FC = () => {
           isVisible={showAIAvatar} 
           onToggle={() => setShowAIAvatar(!showAIAvatar)} 
         />
+
+        {/* Chat Modal */}
+        {showChat && activeChatGroup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="w-full max-w-4xl h-[80vh]">
+              <ChatInterface 
+                groupId={activeChatGroup.id} 
+                groupName={activeChatGroup.name} 
+                onClose={() => {
+                  setShowChat(false);
+                  setActiveChatGroup(null);
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </GameProvider>
   );
