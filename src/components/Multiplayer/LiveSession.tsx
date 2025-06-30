@@ -27,7 +27,7 @@ interface ChatMessage {
 }
 
 const LiveSession: React.FC<LiveSessionProps> = ({ roomId, onClose }) => {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState('');
