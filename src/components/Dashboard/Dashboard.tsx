@@ -76,10 +76,10 @@ const Dashboard: React.FC = () => {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-3 sm:space-y-4">
             {[
-              { action: 'Completed Endodontics Module', time: '2 hours ago', xp: 50, image: 'https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { action: 'Earned "Precision Star" Badge', time: '1 day ago', xp: 25, image: 'https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { action: 'Finished Root Canal Quiz', time: '2 days ago', xp: 30, image: 'https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { action: 'Started Prosthodontics Course', time: '3 days ago', xp: 0, image: 'https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Completed Endodontics Module', time: '2 hours ago', xp: 50, image: 'https://images.pexels.com/photos/4687360/pexels-photo-4687360.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Earned "Precision Star" Badge', time: '1 day ago', xp: 25, image: 'https://images.pexels.com/photos/3845757/pexels-photo-3845757.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Finished Root Canal Quiz', time: '2 days ago', xp: 30, image: 'https://images.pexels.com/photos/3881449/pexels-photo-3881449.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { action: 'Started Prosthodontics Course', time: '3 days ago', xp: 0, image: 'https://images.pexels.com/photos/3845743/pexels-photo-3845743.jpeg?auto=compress&cs=tinysrgb&w=100' },
             ].map((activity, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3 flex-1 min-w-0">
@@ -106,10 +106,10 @@ const Dashboard: React.FC = () => {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Study Progress</h3>
           <div className="space-y-3 sm:space-y-4">
             {[
-              { specialty: 'Endodontics', progress: 85, color: 'bg-blue-500', image: 'https://images.pexels.com/photos/3779709/pexels-photo-3779709.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { specialty: 'Periodontics', progress: 62, color: 'bg-green-500', image: 'https://images.pexels.com/photos/3779693/pexels-photo-3779693.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { specialty: 'Prosthodontics', progress: 45, color: 'bg-purple-500', image: 'https://images.pexels.com/photos/3779698/pexels-photo-3779698.jpeg?auto=compress&cs=tinysrgb&w=100' },
-              { specialty: 'Orthodontics', progress: 30, color: 'bg-orange-500', image: 'https://images.pexels.com/photos/3779714/pexels-photo-3779714.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Endodontics', progress: 85, color: 'bg-blue-500', image: 'https://images.pexels.com/photos/4270367/pexels-photo-4270367.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Periodontics', progress: 62, color: 'bg-green-500', image: 'https://images.pexels.com/photos/3845743/pexels-photo-3845743.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Prosthodontics', progress: 45, color: 'bg-purple-500', image: 'https://images.pexels.com/photos/3881449/pexels-photo-3881449.jpeg?auto=compress&cs=tinysrgb&w=100' },
+              { specialty: 'Orthodontics', progress: 30, color: 'bg-orange-500', image: 'https://images.pexels.com/photos/4687360/pexels-photo-4687360.jpeg?auto=compress&cs=tinysrgb&w=100' },
             ].map((item, index) => (
               <div key={index} className="flex items-center space-x-3">
                 {item.image && (
@@ -336,7 +336,7 @@ const Dashboard: React.FC = () => {
               title: "Hands-on Workshop: Dental Photography",
               date: "June 22, 2025",
               time: "9:00 AM - 12:00 PM",
-              image: "https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/4687360/pexels-photo-4687360.jpeg?auto=compress&cs=tinysrgb&w=600",
               attendees: 15
             }
           ].map((event, index) => (

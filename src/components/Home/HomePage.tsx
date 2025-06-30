@@ -52,19 +52,19 @@ const HomePage: React.FC = () => {
       quote: "DentalMentor has revolutionized how I study dental procedures. The 3D simulations make complex techniques much easier to understand.",
       author: "Dr. Sarah Chen",
       role: "Dental Student, Year 3",
-      image: "https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=150"
+      image: "https://images.pexels.com/photos/5214961/pexels-photo-5214961.jpeg?auto=compress&cs=tinysrgb&w=150"
     },
     {
       quote: "The AI mentor provides instant feedback on my preparation techniques. It's like having a professor available 24/7.",
       author: "Dr. Michael Rodriguez",
       role: "Prosthodontics Resident",
-      image: "https://images.pexels.com/photos/5327921/pexels-photo-5327921.jpeg?auto=compress&cs=tinysrgb&w=150"
+      image: "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=150"
     },
     {
       quote: "Study groups have connected me with peers around the world. We share cases and learn from each other's experiences.",
       author: "Dr. Emily Zhang",
       role: "General Dentist",
-      image: "https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg?auto=compress&cs=tinysrgb&w=150"
+      image: "https://images.pexels.com/photos/5214987/pexels-photo-5214987.jpeg?auto=compress&cs=tinysrgb&w=150"
     }
   ];
 
