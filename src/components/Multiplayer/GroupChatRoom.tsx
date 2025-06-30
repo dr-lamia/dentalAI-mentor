@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, User, MessageCircle, Paperclip, Image, Smile, Video, Users, X, Clock } from 'lucide-react';
+import { Send, User, MessageCircle, Paperclip, Image, Smile, Video, Users, X, Clock, BookOpen } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 import { StudyGroup } from '../../types';
 
