@@ -275,25 +275,25 @@ const Dashboard: React.FC = () => {
             {
               title: "Advanced Endodontics",
               description: "Master complex root canal procedures",
-              image: "https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/4687360/pexels-photo-4687360.jpeg?auto=compress&cs=tinysrgb&w=600",
               category: "Course"
             },
             {
               title: "Dental Implant Techniques",
               description: "Latest approaches in implantology",
-              image: "https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/3845757/pexels-photo-3845757.jpeg?auto=compress&cs=tinysrgb&w=600",
               category: "Workshop"
             },
             {
               title: "Esthetic Dentistry",
               description: "Creating beautiful, natural smiles",
-              image: "https://images.pexels.com/photos/3845806/pexels-photo-3845806.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/3881449/pexels-photo-3881449.jpeg?auto=compress&cs=tinysrgb&w=600",
               category: "Webinar"
             },
             {
               title: "Periodontal Surgery",
               description: "Surgical techniques for gum disease",
-              image: "https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/3845743/pexels-photo-3845743.jpeg?auto=compress&cs=tinysrgb&w=600",
               category: "Masterclass"
             }
           ].map((resource, index) => (
@@ -322,14 +322,14 @@ const Dashboard: React.FC = () => {
               title: "Live Webinar: Digital Dentistry",
               date: "June 15, 2025",
               time: "2:00 PM - 4:00 PM",
-              image: "https://images.pexels.com/photos/3845769/pexels-photo-3845769.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/3845743/pexels-photo-3845743.jpeg?auto=compress&cs=tinysrgb&w=600",
               attendees: 42
             },
             {
               title: "Case Study Discussion: Complex Restorations",
               date: "June 18, 2025",
               time: "6:30 PM - 8:00 PM",
-              image: "https://images.pexels.com/photos/3845741/pexels-photo-3845741.jpeg?auto=compress&cs=tinysrgb&w=600",
+              image: "https://images.pexels.com/photos/4270367/pexels-photo-4270367.jpeg?auto=compress&cs=tinysrgb&w=600",
               attendees: 28
             },
             {
