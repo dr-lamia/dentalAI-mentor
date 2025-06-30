@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MessageCircle, Users } from 'lucide-react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { GameProvider } from './contexts/GameContext';
 import AuthPage from './components/Auth/AuthPage';
