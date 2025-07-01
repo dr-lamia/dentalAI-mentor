@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Users, TrendingUp, Clock, Award, BarChart3, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, BookOpen, FileQuestion, Stethoscope } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, TrendingUp, Clock, Award, BarChart3, Search, Filter, Download, CheckCircle, XCircle, AlertTriangle, BookOpen, FileQuestion, Stethoscope, X, Eye } from 'lucide-react';
 import { useGame } from '../../contexts/GameContext';
 
 interface Student {
