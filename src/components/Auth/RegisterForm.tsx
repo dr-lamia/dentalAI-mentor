@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, GraduationCap, Users } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, UserPlus, GraduationCap, ClipboardCheck as ChalkboardTeacher } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
 interface RegisterFormProps {
@@ -147,7 +147,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
                   onChange={handleChange}
                   className="sr-only"
                 />
-                <Users className="w-5 h-5 mr-2 text-purple-600" />
+                <ChalkboardTeacher className="w-5 h-5 mr-2 text-purple-600" />
                 <span className="font-medium">Teacher</span>
               </label>
             </div>

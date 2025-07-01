@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, Trophy, Smartphone, MessageCircle, Calendar, ArrowRight, GraduationCap, ChalkboardTeacher } from 'lucide-react';
+import { BookOpen, Users, Trophy, Smartphone, MessageCircle, Calendar, ArrowRight, GraduationCap, ClipboardCheck as ChalkboardTeacher } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 

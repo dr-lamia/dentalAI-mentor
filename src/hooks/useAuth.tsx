@@ -64,8 +64,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         globalRank: 47
       };
 
-      setUser(demoUser);
-      setToken('demo-token');
+      setUser(null); // Don't auto-authenticate anymore
+      setToken(null);
       setIsLoading(false);
     };
 
@@ -75,8 +75,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     // Mock login - automatically succeed
     const demoUser: User = {
-      id: 'demo-student-1',
-      name: 'Demo Student',
+      id: 'demo-user-1',
+      name: email.includes('teacher') ? 'Dr. Sarah Johnson' : 'Alex Chen',
       email: email,
       role: email.includes('teacher') ? 'teacher' : 'student',
       level: 3,
