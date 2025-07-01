@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, Trophy, Smartphone, MessageCircle, Calendar, ArrowRight } from 'lucide-react';
+import { BookOpen, Users, Trophy, Smartphone, MessageCircle, Calendar, ArrowRight, GraduationCap, ChalkboardTeacher } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -98,22 +98,44 @@ const HomePage: React.FC = () => {
                 <p className="mt-6 text-xl text-gray-600 max-w-2xl">
                   DentalMentor combines AI-powered learning, 3D simulations, and collaborative tools to revolutionize how dental professionals master their craft.
                 </p>
-                <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                  <button 
+                
+                {/* Role Selection */}
+                <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 cursor-pointer hover:shadow-xl transition-all duration-200"
                     onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth')}
-                    className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium text-lg shadow-lg hover:shadow-xl"
                   >
-                    Get Started
-                  </button>
-                  <button 
-                    onClick={() => {
-                      const demoSection = document.getElementById('features');
-                      demoSection?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="px-8 py-4 bg-white text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium text-lg"
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                        <GraduationCap className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Join as Student</h3>
+                      <p className="text-gray-600 mb-4">Access interactive learning modules, quizzes, and AI-powered assistance</p>
+                      <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors w-full flex items-center justify-center">
+                        <span>Get Started</span>
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </button>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 cursor-pointer hover:shadow-xl transition-all duration-200"
+                    onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth')}
                   >
-                    Explore Features
-                  </button>
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                        <ChalkboardTeacher className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Join as Tutor</h3>
+                      <p className="text-gray-600 mb-4">Create content, monitor student progress, and manage educational resources</p>
+                      <button className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors w-full flex items-center justify-center">
+                        <span>Get Started</span>
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </button>
+                    </div>
+                  </motion.div>
                 </div>
               </motion.div>
             </div>
@@ -261,13 +283,22 @@ const HomePage: React.FC = () => {
               <p className="text-xl text-blue-100 mb-8">
                 Join DentalMentor today and experience the future of interactive dental learning.
               </p>
-              <button 
-                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth')}
-                className="px-8 py-4 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-200 font-medium text-lg shadow-lg flex items-center"
-              >
-                Get Started Now
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth')}
+                  className="px-8 py-4 bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-200 font-medium text-lg shadow-lg flex items-center justify-center"
+                >
+                  Join as Student
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
+                <button 
+                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth')}
+                  className="px-8 py-4 bg-purple-700 text-white rounded-xl hover:bg-purple-800 transition-all duration-200 font-medium text-lg shadow-lg flex items-center justify-center"
+                >
+                  Join as Tutor
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
+              </div>
             </div>
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
