@@ -18,9 +18,10 @@ import LaboratoryScene from './components/Scenes/LaboratoryScene';
 import AIAvatar from './components/AI/AIAvatar';
 import ChatInterface from './components/Multiplayer/ChatInterface';
 import HomePage from './components/Home/HomePage';
+import TeacherDashboard from './components/teacher/TeacherDashboard';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [activeScene, setActiveScene] = useState<string | null>(null);
   const [showAIAvatar, setShowAIAvatar] = useState(false);
@@ -31,7 +32,7 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg sm:text-xl">DM</span>
           </div>
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Loading DentalMentor...</h2>
@@ -173,58 +174,62 @@ const AppContent: React.FC = () => {
           <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
           <Route path="/dashboard/*" element={
             isAuthenticated ? (
-              <div className="min-h-screen bg-gray-50">
-                {/* Header - always visible unless in scene mode */}
-                {!activeScene && <Header />}
-                
-                <div className="flex">
-                  {/* Navigation - hidden in scene mode */}
-                  {!activeScene && (
-                    <Navigation 
-                      activeTab={activeTab} 
-                      onTabChange={setActiveTab}
-                      onSceneSelect={setActiveScene}
-                    />
-                  )}
+              user?.role === 'teacher' ? (
+                <TeacherDashboard />
+              ) : (
+                <div className="min-h-screen bg-gray-50">
+                  {/* Header - always visible unless in scene mode */}
+                  {!activeScene && <Header />}
                   
-                  {/* Main Content */}
-                  <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''} ${!activeScene ? 'lg:ml-0' : ''}`}>
-                    {/* Scene Exit Button */}
-                    {activeScene && (
-                      <button
-                        onClick={() => setActiveScene(null)}
-                        className="fixed top-4 left-4 z-50 px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium text-sm sm:text-base"
-                      >
-                        ← Exit Scene
-                      </button>
+                  <div className="flex">
+                    {/* Navigation - hidden in scene mode */}
+                    {!activeScene && (
+                      <Navigation 
+                        activeTab={activeTab} 
+                        onTabChange={setActiveTab}
+                        onSceneSelect={setActiveScene}
+                      />
                     )}
                     
-                    {renderContent()}
-                  </main>
-                </div>
-
-                {/* AI Avatar - always available */}
-                <AIAvatar 
-                  isVisible={showAIAvatar} 
-                  onToggle={() => setShowAIAvatar(!showAIAvatar)} 
-                />
-
-                {/* Chat Modal */}
-                {showChat && activeChatGroup && (
-                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="w-full max-w-4xl h-[80vh]">
-                      <ChatInterface 
-                        groupId={activeChatGroup.id} 
-                        groupName={activeChatGroup.name} 
-                        onClose={() => {
-                          setShowChat(false);
-                          setActiveChatGroup(null);
-                        }}
-                      />
-                    </div>
+                    {/* Main Content */}
+                    <main className={`flex-1 overflow-auto ${activeScene ? 'h-screen' : ''} ${!activeScene ? 'lg:ml-0' : ''}`}>
+                      {/* Scene Exit Button */}
+                      {activeScene && (
+                        <button
+                          onClick={() => setActiveScene(null)}
+                          className="fixed top-4 left-4 z-50 px-3 py-2 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-lg shadow-lg hover:bg-white transition-all duration-200 font-medium text-sm sm:text-base"
+                        >
+                          ← Exit Scene
+                        </button>
+                      )}
+                      
+                      {renderContent()}
+                    </main>
                   </div>
-                )}
-              </div>
+
+                  {/* AI Avatar - always available */}
+                  <AIAvatar 
+                    isVisible={showAIAvatar} 
+                    onToggle={() => setShowAIAvatar(!showAIAvatar)} 
+                  />
+
+                  {/* Chat Modal */}
+                  {showChat && activeChatGroup && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                      <div className="w-full max-w-4xl h-[80vh]">
+                        <ChatInterface 
+                          groupId={activeChatGroup.id} 
+                          groupName={activeChatGroup.name} 
+                          onClose={() => {
+                            setShowChat(false);
+                            setActiveChatGroup(null);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
             ) : (
               <Navigate to="/auth" />
             )
