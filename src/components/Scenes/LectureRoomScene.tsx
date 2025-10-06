@@ -211,14 +211,7 @@ const LectureRoomScene: React.FC = () => {
       timestamp: new Date()
     };
 
-      console.warn('Gemini API not available, using fallback response:', error);
-      // Provide fallback response when API is not available
-      const fallbackResponse = generateFallbackResponse(currentQuestion);
-      setMessages(prev => [
-        ...prev,
-        { type: 'user', content: currentQuestion },
-        { type: 'ai', content: fallbackResponse }
-      ]);
+    try {
       let answer = '';
       
       // Try using Gemini directly if available
@@ -259,9 +252,12 @@ const LectureRoomScene: React.FC = () => {
       dispatch({ type: 'EARN_XP', payload: 10 });
     } catch (error) {
       console.error('Error getting response:', error);
+      console.warn('Gemini API not available, using fallback response:', error);
+      // Provide fallback response when API is not available
+      const fallbackResponse = generateFallbackResponse(currentQuestion);
       const errorQuestion = { 
         ...newQuestion, 
-        answer: "I apologize, but I'm having trouble processing your question right now. Please try again!" 
+        answer: fallbackResponse
       };
       setChatHistory(prev => [...prev, errorQuestion]);
     } finally {
