@@ -211,7 +211,14 @@ const LectureRoomScene: React.FC = () => {
       timestamp: new Date()
     };
 
-    try {
+      console.warn('Gemini API not available, using fallback response:', error);
+      // Provide fallback response when API is not available
+      const fallbackResponse = generateFallbackResponse(currentQuestion);
+      setMessages(prev => [
+        ...prev,
+        { type: 'user', content: currentQuestion },
+        { type: 'ai', content: fallbackResponse }
+      ]);
       let answer = '';
       
       // Try using Gemini directly if available
@@ -260,6 +267,32 @@ const LectureRoomScene: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const generateFallbackResponse = (question: string): string => {
+    const lowerQuestion = question.toLowerCase();
+    
+    if (lowerQuestion.includes('tooth') || lowerQuestion.includes('teeth')) {
+      return "Great question about dental anatomy! Teeth are complex structures with multiple layers including enamel, dentin, and pulp. Each tooth type serves a specific function in mastication. Would you like to explore the different types of teeth and their functions?";
+    }
+    
+    if (lowerQuestion.includes('cavity') || lowerQuestion.includes('caries')) {
+      return "Dental caries (cavities) are caused by bacterial acid production that demineralizes tooth enamel. Prevention includes proper oral hygiene, fluoride use, and dietary modifications. Treatment depends on the extent of decay and may involve fillings, crowns, or root canal therapy.";
+    }
+    
+    if (lowerQuestion.includes('gum') || lowerQuestion.includes('periodontal')) {
+      return "Periodontal health is crucial for overall oral health. Gum disease progresses from gingivitis to periodontitis if left untreated. Key factors include plaque accumulation, bacterial toxins, and host immune response. Treatment ranges from scaling and root planing to surgical interventions.";
+    }
+    
+    if (lowerQuestion.includes('root canal') || lowerQuestion.includes('endodontic')) {
+      return "Endodontic treatment involves removing infected or damaged pulp tissue from the tooth's root canal system. The procedure includes access cavity preparation, cleaning and shaping, disinfection, and obturation. Success depends on proper diagnosis and technique.";
+    }
+    
+    if (lowerQuestion.includes('implant')) {
+      return "Dental implants are titanium fixtures that integrate with bone through osseointegration. Success factors include adequate bone volume, proper surgical technique, and maintenance of peri-implant health. They provide excellent long-term solutions for tooth replacement.";
+    }
+    
+    return "That's an interesting question about dentistry! While I'd love to provide a detailed response, the AI service is currently unavailable. Please refer to your course materials or consult with your instructor for comprehensive information on this topic.";
   };
 
   const filteredNotes = lectureNotes.filter(note =>
