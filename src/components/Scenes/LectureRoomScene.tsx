@@ -60,7 +60,7 @@ const LectureRoomScene: React.FC = () => {
   useEffect(() => {
     // Initialize Google Gemini AI
     try {
-      const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s';
+      const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyAAaNkc4OOGh1uhnMro1i8xvj20XOWUBJc';
       const genAI = new GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
       setGeminiModel(model);

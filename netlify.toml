@@ -13,4 +13,4 @@
   status = 200
 
 [build.environment]
-  VITE_GOOGLE_AI_API_KEY = "AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s"
+  VITE_GOOGLE_AI_API_KEY = "AIzaSyAAaNkc4OOGh1uhnMro1i8xvj20XOWUBJc"

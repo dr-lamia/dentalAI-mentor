@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { aiIntegrationService } from './aiIntegrationService';
 
-const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s';
+const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY || 'AIzaSyAAaNkc4OOGh1uhnMro1i8xvj20XOWUBJc';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 class DentalMentorService {

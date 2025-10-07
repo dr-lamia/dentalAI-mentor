@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Question, Quiz, Module, CaseStudy } from '../types';
 
-const API_KEY = 'AIzaSyA8JXDjJwSsi9IqRtnRTDaOxKhFj0fky-s';
+const API_KEY = 'AIzaSyAAaNkc4OOGh1uhnMro1i8xvj20XOWUBJc';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 class GeminiService {
